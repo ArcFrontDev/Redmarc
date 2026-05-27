@@ -1,0 +1,12 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "search": "Search..."
+  },
+  "kanban": {
+    "title": "Kanban Board",
+    "no_issues": "No issues found"
+  }
+}
