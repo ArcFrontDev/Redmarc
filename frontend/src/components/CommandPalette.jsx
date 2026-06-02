@@ -1,53 +1,57 @@
 import { useState, useEffect } from 'react';
 import { Command } from 'cmdk';
+import { formatStatusName } from '../utils/statusMapping';
 
-export default function CommandPalette({ 
-  open, 
-  setOpen, 
-  issues, 
-  users, 
-  statuses, 
-  selectedIssue, 
+export default function CommandPalette({
+  open,
+  setOpen,
+  issues,
+  users,
+  statuses,
+  selectedIssue,
   onSelectIssue,
   onUpdateIssueStatus,
   onAssignIssue,
   onGlobalFilterUser,
   onGlobalFilterStatus,
   onOpenCreateTask,
-  onToggleTheme
+  onToggleTheme,
 }) {
   const [search, setSearch] = useState('');
 
-  // Toggle the menu when ⌘K or Ctrl+K is pressed
+  // Ctrl+K toggles the palette (also handled in useKeyboard, but kept here for robustness)
   useEffect(() => {
-    const down = (e) => {
+    const handler = e => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpen(o => !o);
       }
     };
-
-    document.addEventListener('keydown', down);
-    return () => document.removeEventListener('keydown', down);
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
   }, [setOpen]);
 
-  // Reset search on close
+  // Clear search on close
   useEffect(() => {
-    if (!open) {
-      setSearch('');
-    }
+    if (!open) setSearch('');
   }, [open]);
 
   const isActionMode = search.startsWith('>');
   const isUserMode = search.startsWith('@');
   const isEmpty = search.trim() === '';
 
-  const handleSelectIssue = (issue) => {
+  // Fuzzy match helper (case-insensitive contains)
+  const matches = (text, query) => {
+    if (!query) return true;
+    return text.toLowerCase().includes(query.toLowerCase());
+  };
+
+  const handleSelectIssue = issue => {
     onSelectIssue(issue);
     setOpen(false);
   };
 
-  const handleUpdateStatus = (statusId) => {
+  const handleUpdateStatus = statusId => {
     if (selectedIssue) {
       onUpdateIssueStatus(selectedIssue.id, statusId);
     } else {
@@ -56,7 +60,7 @@ export default function CommandPalette({
     setOpen(false);
   };
 
-  const handleAssignUser = (userId) => {
+  const handleAssignUser = userId => {
     if (selectedIssue) {
       onAssignIssue(selectedIssue.id, userId);
     } else {
@@ -65,44 +69,44 @@ export default function CommandPalette({
     setOpen(false);
   };
 
-  const handleGlobalAction = (action) => {
-    if (action === 'create') {
-      onOpenCreateTask(true);
-    } else if (action === 'theme_dark') {
-      onToggleTheme('dark');
-    } else if (action === 'theme_light') {
-      onToggleTheme('light');
-    }
+  const handleGlobalAction = action => {
+    if (action === 'create') onOpenCreateTask(true);
+    else if (action === 'theme_dark') onToggleTheme('dark');
+    else if (action === 'theme_light') onToggleTheme('light');
     setOpen(false);
   };
 
-  const recentIssues = issues.slice(0, 4);
+  const recentIssues = issues.slice(0, 5);
+
+  // Issues matching the search query
+  const searchTerm = search.replace(/^[>@]/, '').trim();
+  const matchingIssues = searchTerm
+    ? issues.filter(i =>
+        matches(i.subject, searchTerm) ||
+        matches(`#${i.id}`, searchTerm) ||
+        matches(i.project.name, searchTerm)
+      ).slice(0, 8)
+    : [];
 
   return (
-    <Command.Dialog 
-      open={open} 
-      onOpenChange={setOpen} 
-      label="Global Command Menu"
+    <Command.Dialog
+      open={open}
+      onOpenChange={setOpen}
+      label="Command Menu"
       className="cmdk-dialog"
       filter={(value, search) => {
-        if (!search) return 1;
-        let normalizedSearch = search.toLowerCase();
-        if (normalizedSearch.startsWith('>') || normalizedSearch.startsWith('@')) {
-          normalizedSearch = normalizedSearch.slice(1).trim();
-        }
-        if (!normalizedSearch) return 1;
-        if (value.toLowerCase().includes(normalizedSearch)) return 1;
-        return 0;
+        // Custom filter disabled — we handle filtering ourselves
+        return 1;
       }}
     >
       <div className="cmdk-overlay" onClick={() => setOpen(false)} />
       <div className="cmdk-content glass-panel">
         <div className="cmdk-input-wrapper">
-          <Command.Input 
+          <Command.Input
             autoFocus
             value={search}
             onValueChange={setSearch}
-            placeholder="Type a command (>, @) or search..." 
+            placeholder="Search issues, projects or type a command (>, @)..."
             className="cmdk-input"
           />
         </div>
@@ -110,101 +114,160 @@ export default function CommandPalette({
         <Command.List className="cmdk-list">
           <Command.Empty className="cmdk-empty">No results found.</Command.Empty>
 
+          {/* Empty state — show actions + recent issues */}
           {isEmpty && (
-            <Command.Group heading="Suggested Actions">
-              <Command.Item onSelect={() => handleGlobalAction('create')} className="cmdk-item">
-                <span className="cmdk-action-icon">+</span> Create new issue
-              </Command.Item>
-              <Command.Item onSelect={() => handleGlobalAction('theme_dark')} className="cmdk-item">
-                <span className="cmdk-action-icon">🌙</span> Dark mode
-              </Command.Item>
-              <Command.Item onSelect={() => handleGlobalAction('theme_light')} className="cmdk-item">
-                <span className="cmdk-action-icon">☀️</span> Light mode
-              </Command.Item>
+            <>
+              <Command.Group heading="Actions">
+                <Command.Item
+                  onSelect={() => handleGlobalAction('create')}
+                  className="cmdk-item"
+                  value="create issue"
+                >
+                  <span className="cmdk-action-icon">+</span>
+                  Create new issue
+                </Command.Item>
+                <Command.Item
+                  onSelect={() => handleGlobalAction('theme_dark')}
+                  className="cmdk-item"
+                  value="switch dark mode"
+                >
+                  <span className="cmdk-action-icon">🌙</span>
+                  Switch to Dark mode
+                </Command.Item>
+                <Command.Item
+                  onSelect={() => handleGlobalAction('theme_light')}
+                  className="cmdk-item"
+                  value="switch light mode"
+                >
+                  <span className="cmdk-action-icon">☀️</span>
+                  Switch to Light mode
+                </Command.Item>
+              </Command.Group>
+
               {recentIssues.length > 0 && (
                 <>
                   <div className="cmdk-separator" />
-                  <div className="cmdk-group-heading">Recent Issues</div>
-                  {recentIssues.map(issue => (
-                    <Command.Item key={`recent-${issue.id}`} onSelect={() => handleSelectIssue(issue)} className="cmdk-item">
-                      <span className="cmdk-issue-id">#{issue.id}</span>
-                      {issue.subject}
-                    </Command.Item>
-                  ))}
+                  <Command.Group heading="Recent Issues">
+                    {recentIssues.map(issue => (
+                      <Command.Item
+                        key={`recent-${issue.id}`}
+                        onSelect={() => handleSelectIssue(issue)}
+                        className="cmdk-item"
+                        value={`#${issue.id} ${issue.subject}`}
+                      >
+                        <span className="cmdk-issue-id">#{issue.id}</span>
+                        {issue.subject}
+                      </Command.Item>
+                    ))}
+                  </Command.Group>
                 </>
               )}
+            </>
+          )}
+
+          {/* Issue search results */}
+          {!isEmpty && !isActionMode && !isUserMode && matchingIssues.length > 0 && (
+            <Command.Group heading="Issues">
+              {matchingIssues.map(issue => (
+                <Command.Item
+                  key={issue.id}
+                  onSelect={() => handleSelectIssue(issue)}
+                  className="cmdk-item"
+                  value={`#${issue.id} ${issue.subject} ${issue.project.name}`}
+                >
+                  <span className="cmdk-issue-id">#{issue.id}</span>
+                  <span style={{ flex: 1 }}>{issue.subject}</span>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{issue.project.name}</span>
+                </Command.Item>
+              ))}
             </Command.Group>
           )}
 
+          {/* > action mode */}
           {isActionMode && (
-            <Command.Group heading={selectedIssue ? "Current Issue Actions" : "Global Actions & Filters"}>
+            <Command.Group heading={selectedIssue ? 'Issue Actions' : 'Global Actions'}>
               {!selectedIssue && (
                 <>
-                  <Command.Item onSelect={() => handleGlobalAction('create')} className="cmdk-item">
-                    Create issue (create / new)
+                  <Command.Item
+                    onSelect={() => handleGlobalAction('create')}
+                    className="cmdk-item"
+                    value="create issue"
+                  >
+                    <span className="cmdk-action-icon">+</span>
+                    Create new issue
                   </Command.Item>
-                  <Command.Item onSelect={() => handleGlobalAction('theme_dark')} className="cmdk-item">
-                    Dark mode (theme dark)
+                  <Command.Item
+                    onSelect={() => handleGlobalAction('theme_dark')}
+                    className="cmdk-item"
+                    value="dark mode"
+                  >
+                    Dark mode
                   </Command.Item>
-                  <Command.Item onSelect={() => handleGlobalAction('theme_light')} className="cmdk-item">
-                    Light mode (theme light)
+                  <Command.Item
+                    onSelect={() => handleGlobalAction('theme_light')}
+                    className="cmdk-item"
+                    value="light mode"
+                  >
+                    Light mode
                   </Command.Item>
                   <div className="cmdk-separator" />
                 </>
               )}
-              {statuses.map(s => {
-                const translateStatus = (name) => {
-                  if (!name) return name;
-                  const lowerName = name.toLowerCase();
-                  switch (lowerName) {
-                    case 'новая': return 'New';
-                    case 'в работе': return 'In Progress';
-                    case 'решена': return 'Resolved';
-                    case 'нужен отклик': return 'Feedback';
-                    case 'обратная связь': return 'Feedback';
-                    case 'закрыта': return 'Closed';
-                    case 'отклонена': return 'Rejected';
-                    default: return name;
-                  }
-                };
-                return (
-                  <Command.Item 
-                    key={s.id}
-                    onSelect={() => handleUpdateStatus(s.id)}
-                    className="cmdk-item"
-                  >
-                    {selectedIssue ? `Change status to: ${translateStatus(s.name)}` : `Filter by status: ${translateStatus(s.name)}`}
-                  </Command.Item>
-                );
-              })}
+
+              {statuses.map(s => (
+                <Command.Item
+                  key={s.id}
+                  onSelect={() => handleUpdateStatus(s.id)}
+                  className="cmdk-item"
+                  value={`status ${s.name} ${formatStatusName(s.name)}`}
+                >
+                  {selectedIssue
+                    ? `Change status → ${formatStatusName(s.name)}`
+                    : `Filter by status: ${formatStatusName(s.name)}`}
+                </Command.Item>
+              ))}
+
               {!selectedIssue && (
-                <Command.Item onSelect={() => handleUpdateStatus(null)} className="cmdk-item cmdk-reset">
+                <Command.Item
+                  onSelect={() => handleUpdateStatus(null)}
+                  className="cmdk-item cmdk-reset"
+                  value="clear status filter"
+                >
                   Clear status filter
                 </Command.Item>
               )}
             </Command.Group>
           )}
 
+          {/* @ user mode */}
           {isUserMode && (
-            <Command.Group heading={selectedIssue ? "Assign User" : "Filter by Assignee"}>
+            <Command.Group heading={selectedIssue ? 'Assign User' : 'Filter by Assignee'}>
               {users.map(u => (
-                <Command.Item 
+                <Command.Item
                   key={u.id}
                   onSelect={() => handleAssignUser(u.id)}
                   className="cmdk-item"
+                  value={`user ${u.name || u.login}`}
                 >
-                  {selectedIssue ? `Assign to: ${u.name}` : `Filter by assignee: ${u.name}`}
+                  <span className="cmdk-action-icon" style={{ fontSize: '13px' }}>
+                    {(u.name || u.login || 'U').charAt(0).toUpperCase()}
+                  </span>
+                  {selectedIssue
+                    ? `Assign to: ${u.name || u.login}`
+                    : `Filter by: ${u.name || u.login}`}
                 </Command.Item>
               ))}
               {!selectedIssue && (
-                <Command.Item onSelect={() => handleAssignUser(null)} className="cmdk-item cmdk-reset">
+                <Command.Item
+                  onSelect={() => handleAssignUser(null)}
+                  className="cmdk-item cmdk-reset"
+                  value="clear assignee filter"
+                >
                   Clear assignee filter
                 </Command.Item>
               )}
             </Command.Group>
           )}
-
-          {/* Text search removed from Command Palette - use Header Search instead */}
         </Command.List>
       </div>
     </Command.Dialog>

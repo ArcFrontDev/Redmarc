@@ -1,82 +1,136 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+/* ==========================================================================
+   Productive Dark 2.0 — default theme
+   Philosophy: comfort after 8 hours, not "wow at first glance"
+   ========================================================================== */
 :root {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: dark;
-  color: #e2e8f0;
-  background-color: #08080c;
-
+  color: #e8eaf0;
+  background-color: #111318;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Custom variables for premium design */
-  --bg-app: #08080c;
-  --bg-sidebar: #0f0f15;
-  --bg-surface: #14141d;
-  --bg-card: #191926;
-  --bg-modal: rgba(18, 18, 28, 0.8);
-  --bg-input: rgba(0, 0, 0, 0.25);
-  --bg-column: rgba(25, 25, 38, 0.4);
-  --bg-sidebar-footer: rgba(0, 0, 0, 0.15);
-  
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-column: rgba(255, 255, 255, 0.09);
-  --border-focus: rgba(124, 58, 237, 0.5);
-  
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #475569;
+  /* Backgrounds */
+  --bg-app: #111318;
+  --bg-sidebar: #161922;
+  --bg-surface: #1a1d24;
+  --bg-card: #21252e;
+  --bg-modal: rgba(22, 25, 34, 0.97);
+  --bg-input: rgba(0, 0, 0, 0.2);
+  --bg-column: rgba(26, 29, 36, 0.6);
+  --bg-sidebar-footer: rgba(0, 0, 0, 0.18);
 
-  --color-accent: #7c3aed;
-  --color-accent-glow: rgba(124, 58, 237, 0.15);
-  
-  --color-todo: #3b82f6;
+  /* Borders */
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-column: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(91, 106, 240, 0.55);
+
+  /* Text */
+  --text-primary: #e8eaf0;
+  --text-secondary: #8892a4;
+  --text-muted: #505870;
+
+  /* Accent — blue-violet, less aggressive than classic purple */
+  --color-accent: #5b6af0;
+  --color-accent-hover: #7280f5;
+  --color-accent-glow: rgba(91, 106, 240, 0.12);
+
+  /* Kanban column status colors */
+  --color-todo: #60a5fa;
   --color-progress: #f59e0b;
-  --color-done: #10b981;
+  --color-review: #a78bfa;
+  --color-done: #34d399;
   --color-closed: #64748b;
-  
+
+  /* Shadows — only on hover/active, not on rest state */
+  --shadow-card: none;
+  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.5);
+
+  /* Radius */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
-  
-  --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
-  --modal-overlay-bg: rgba(5, 5, 8, 0.7);
-  --card-hover-bg: #191925;
+
+  /* Transitions */
+  --transition-smooth: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Misc */
+  --modal-overlay-bg: rgba(5, 7, 12, 0.65);
+  --card-hover-bg: #262b36;
 }
 
+/* ==========================================================================
+   Editorial Light 2.0 — independent design, NOT a dark theme inversion
+   Inspiration: Notion, Linear, GitHub
+   ========================================================================== */
 body.light-theme {
-  --bg-app: #e8edf5;
-  --bg-sidebar: #dde3ef;
-  --bg-surface: #eef1f8;
-  --bg-card: #f4f6fb;
-  --bg-modal: rgba(240, 244, 252, 0.97);
+  color-scheme: light;
+  --bg-app: #f4f5f7;
+  --bg-sidebar: #ebedf2;
+  --bg-surface: #f0f2f5;
+  --bg-card: #ffffff;
+  --bg-modal: rgba(255, 255, 255, 0.99);
   --bg-input: rgba(0, 0, 0, 0.04);
-  --bg-column: rgba(210, 218, 234, 0.6);
-  --bg-sidebar-footer: rgba(0, 0, 0, 0.06);
-  
-  --border-subtle: rgba(0, 0, 0, 0.10);
-  --border-column: rgba(0, 0, 0, 0.08);
-  --border-focus: rgba(124, 58, 237, 0.6);
-  
-  --text-primary: #0f172a;
-  --text-secondary: #3a4a62;
-  --text-muted: #6b7a96;
-  
+  --bg-column: rgba(220, 224, 234, 0.55);
+  --bg-sidebar-footer: rgba(0, 0, 0, 0.05);
+
+  --border-subtle: #e4e6ea;
+  --border-column: #dde0e8;
+  --border-focus: rgba(79, 82, 201, 0.55);
+
+  --text-primary: #1a1d27;
+  --text-secondary: #5a6175;
+  --text-muted: #9099ae;
+
+  --color-accent: #4f52c9;
+  --color-accent-hover: #6366d4;
+  --color-accent-glow: rgba(79, 82, 201, 0.08);
+
+  --color-todo: #3b82f6;
+  --color-progress: #d97706;
+  --color-review: #7c3aed;
+  --color-done: #059669;
+  --color-closed: #6b7280;
+
+  /* Subtle editorial shadows — no neon */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.10), 0 2px 4px rgba(0, 0, 0, 0.06);
   --shadow-premium: 0 10px 30px -10px rgba(15, 23, 42, 0.12);
-  --modal-overlay-bg: rgba(15, 23, 42, 0.4);
-  --card-hover-bg: #ecf0f9;
+  --shadow-modal: 0 20px 60px rgba(15, 23, 42, 0.16);
+
+  --modal-overlay-bg: rgba(15, 23, 42, 0.35);
+  --card-hover-bg: #f9fafb;
 }
 
+/* ==========================================================================
+   Reset & Base
+   ========================================================================== */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+select {
+  color-scheme: dark;
+}
+
+body.light-theme select {
+  color-scheme: light;
+}
+
+select option {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
 }
 
 body {
@@ -95,239 +149,277 @@ body {
   display: flex;
 }
 
-/* Brand logo circular wrapper */
+/* ==========================================================================
+   Scrollbar
+   ========================================================================== */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.14); }
+body.light-theme ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.12); }
+body.light-theme ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.2); }
+
+/* ==========================================================================
+   Brand Logo
+   ========================================================================== */
 .brand-logo-circle {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(59,130,246,0.2));
+  background: var(--color-accent-glow);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   margin-right: 4px;
-  box-shadow: 0 0 0 2px rgba(124,58,237,0.25);
+  border: 1px solid rgba(91, 106, 240, 0.2);
 }
 
-/* Secondary button style */
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-primary) !important;
-}
-
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-body.light-theme .btn-secondary {
-  background: rgba(0,0,0,0.04);
-  border-color: rgba(0,0,0,0.12);
-}
-
-body.light-theme .btn-secondary:hover {
-  background: rgba(0,0,0,0.08);
-}
-
-/* Light theme: btn-primary must have white text */
-.light-theme .btn-primary {
-  color: #ffffff !important;
-}
-
-/* Light theme modal: solid white background */
-.light-theme .modal-panel,
-.light-theme .glass-panel {
-  background: var(--bg-modal);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: 1px solid rgba(0,0,0,0.10);
-  box-shadow: 0 20px 60px rgba(15,23,42,0.18);
-}
-
-/* Sidebar section shading - brand header, nav, footer are distinct */
-.app-sidebar .brand-header {
-  background: rgba(0,0,0,0.08);
-}
-
-body.light-theme .app-sidebar .brand-header {
-  background: rgba(0,0,0,0.07);
-}
-
-.app-sidebar .sidebar-footer {
-  background: rgba(0,0,0,0.12);
-}
-
-body.light-theme .app-sidebar .sidebar-footer {
-  background: rgba(0,0,0,0.08);
-}
-
-.app-sidebar .sidebar-hotkeys {
-  background: rgba(0,0,0,0.10);
-}
-
-body.light-theme .app-sidebar .sidebar-hotkeys {
-  background: rgba(0,0,0,0.06);
-}
-
-/* Search bar - darker background for better visibility */
-.search-input:focus {
-  background: var(--bg-input);
-  border-color: var(--border-focus);
-  box-shadow: 0 0 8px rgba(124,58,237,0.2);
-}
-
-/* Icon buttons (theme toggle & refresh) - more visible */
-.btn-icon {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.09);
-  color: var(--text-primary);
-  padding: 4px;
-  border-radius: var(--radius-sm);
-}
-
-.btn-icon:hover {
-  background: rgba(255,255,255,0.14);
-  border-color: rgba(255,255,255,0.18);
-}
-
-body.light-theme .btn-icon {
-  background: rgba(0,0,0,0.07);
-  border: 1px solid rgba(0,0,0,0.12);
-}
-
-body.light-theme .btn-icon:hover {
-  background: rgba(0,0,0,0.13);
-  border-color: rgba(0,0,0,0.18);
-}
-
-/* Scrollbar Customization */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-/* Micro-animations and Utilities */
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 14px;
+  padding: 7px 13px;
   font-size: 13px;
   font-weight: 500;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.07);
   color: var(--text-primary) !important;
   cursor: pointer;
   transition: var(--transition-smooth);
-  gap: 8px;
+  gap: 7px;
   outline: none;
+  font-family: inherit;
 }
 
 .btn:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.13);
   transform: translateY(-1px);
 }
 
-.btn:active {
-  transform: translateY(0);
+.btn:active { transform: translateY(0); }
+
+body.light-theme .btn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: var(--border-subtle);
+}
+
+body.light-theme .btn:hover {
+  background: rgba(0, 0, 0, 0.07);
 }
 
 .btn-primary {
   background: var(--color-accent);
   border-color: transparent;
-  box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(91, 106, 240, 0.25);
 }
 
 .btn-primary:hover {
-  background: #8b5cf6;
+  background: var(--color-accent-hover);
   border-color: transparent;
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+  box-shadow: 0 4px 14px rgba(91, 106, 240, 0.38);
 }
 
-/* Glassmorphism card */
-.glass-panel {
-  background: rgba(20, 20, 29, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+body.light-theme .btn-primary {
+  background: var(--color-accent);
+  border-color: transparent;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(79, 82, 201, 0.25);
+}
+
+body.light-theme .btn-primary:hover {
+  background: var(--color-accent-hover);
+  border-color: transparent;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-subtle);
+  color: var(--text-primary) !important;
 }
 
-/* Keyboard badge */
-.kbd {
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+body.light-theme .btn-secondary {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.10);
+}
+
+body.light-theme .btn-secondary:hover {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 5px;
-  font-size: 10px;
-  font-family: monospace;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  color: var(--text-secondary);
-  box-shadow: 0 1px 0 rgba(0,0,0,0.5);
 }
 
+.btn-icon:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.13);
+  color: var(--text-primary);
+  transform: translateY(0);
+}
+
+body.light-theme .btn-icon {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  color: var(--text-secondary);
+}
+
+body.light-theme .btn-icon:hover {
+  background: rgba(0, 0, 0, 0.09);
+  color: var(--text-primary);
+}
 
 /* ==========================================================================
-   CMDK Command Palette Styles
+   Glassmorphism — Command Palette ONLY
    ========================================================================== */
+.glass-panel {
+  background: rgba(22, 25, 34, 0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-subtle);
+}
 
+body.light-theme .glass-panel {
+  background: var(--bg-modal);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  box-shadow: var(--shadow-modal);
+}
+
+/* Modal panels (non-command-palette) — solid, no blur */
+.modal-panel {
+  background: var(--bg-modal);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-modal);
+}
+
+body.light-theme .modal-panel {
+  background: var(--bg-modal);
+  border-color: rgba(0, 0, 0, 0.09);
+}
+
+/* ==========================================================================
+   Keyboard badge
+   ========================================================================== */
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-family: monospace;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+body.light-theme kbd {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.14);
+}
+
+/* ==========================================================================
+   Sidebar section shading
+   ========================================================================== */
+.app-sidebar .brand-header { background: rgba(0, 0, 0, 0.10); }
+body.light-theme .app-sidebar .brand-header { background: rgba(0, 0, 0, 0.05); }
+.app-sidebar .sidebar-footer { background: rgba(0, 0, 0, 0.14); }
+body.light-theme .app-sidebar .sidebar-footer { background: rgba(0, 0, 0, 0.06); }
+.app-sidebar .sidebar-hotkeys { background: rgba(0, 0, 0, 0.10); }
+body.light-theme .app-sidebar .sidebar-hotkeys { background: rgba(0, 0, 0, 0.04); }
+
+/* ==========================================================================
+   Error Boundary
+   ========================================================================== */
+.error-boundary-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 12px;
+  padding: 40px;
+  text-align: center;
+}
+
+.error-boundary-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ef4444;
+}
+
+.error-boundary-message {
+  font-size: 13px;
+  color: var(--text-secondary);
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+.error-boundary-retry { margin-top: 8px; }
+
+/* ==========================================================================
+   Command Palette (cmdk)
+   ========================================================================== */
 [cmdk-dialog] {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
   z-index: 1000;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 15vh;
+  padding-top: 14vh;
 }
 
 .cmdk-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.4);
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(4px);
   z-index: -1;
-  animation: fadeIn 0.2s ease-out forwards;
+  animation: fadeIn 0.15s ease-out forwards;
 }
 
 .cmdk-content {
   width: 100%;
-  max-width: 600px;
-  border-radius: 12px;
+  max-width: 580px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border-color);
-  animation: scaleIn 0.2s ease-out forwards;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--border-subtle);
+  animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .cmdk-input-wrapper {
-  padding: 16px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .cmdk-input {
@@ -336,95 +428,103 @@ body.light-theme .btn-icon:hover {
   border: none;
   outline: none;
   color: var(--text-primary);
-  font-size: 16px;
+  font-size: 15px;
   font-family: inherit;
 }
 
-.cmdk-input::placeholder {
-  color: var(--text-secondary);
-}
+.cmdk-input::placeholder { color: var(--text-muted); }
 
 .cmdk-list {
-  max-height: 400px;
+  max-height: 380px;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: 6px 0;
 }
 
 .cmdk-empty {
   padding: 24px;
   text-align: center;
-  color: var(--text-secondary);
-  font-size: 14px;
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 [cmdk-group-heading], .cmdk-group-heading {
-  padding: 8px 16px;
-  font-size: 11px;
+  padding: 8px 14px 4px;
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-secondary);
-  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  font-weight: 700;
 }
 
 .cmdk-item {
-  padding: 12px 16px;
-  font-size: 14px;
+  padding: 10px 14px;
+  font-size: 13px;
   color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   cursor: pointer;
-  transition: all 0.1s ease;
+  transition: background 0.1s;
 }
 
-.cmdk-item[data-selected="true"],
+.cmdk-item[data-selected='true'],
 .cmdk-item:hover {
-  background: rgba(124, 58, 237, 0.1);
+  background: rgba(91, 106, 240, 0.10);
+  color: var(--color-accent);
+}
+
+body.light-theme .cmdk-item[data-selected='true'],
+body.light-theme .cmdk-item:hover {
+  background: rgba(79, 82, 201, 0.07);
   color: var(--color-accent);
 }
 
 .cmdk-issue-id {
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-family: monospace;
-  font-size: 13px;
-  opacity: 0.7;
+  font-size: 11px;
 }
 
 .cmdk-action-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 22px; height: 22px;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
+  border-radius: 5px;
   font-size: 12px;
-  color: var(--text-primary);
+  color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
 .cmdk-separator {
   height: 1px;
-  background: var(--border-color);
-  margin: 8px 0;
+  background: var(--border-subtle);
+  margin: 4px 0;
 }
 
-.cmdk-reset {
-  color: var(--danger-color);
-}
+.cmdk-reset { color: #f87171; }
+.cmdk-reset[data-selected='true'],
+.cmdk-reset:hover { background: rgba(239, 68, 68, 0.08); color: #ef4444; }
 
-.cmdk-reset[data-selected="true"],
-.cmdk-reset:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--danger-color);
-}
-
+/* ==========================================================================
+   Animations
+   ========================================================================== */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0.95; transform: scale(0.98); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: scale(0.97) translateY(-4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

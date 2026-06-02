@@ -1,12 +1,113 @@
 {
-  "common": {
-    "loading": "Loading...",
-    "save": "Save",
-    "cancel": "Cancel",
-    "search": "Search..."
+  "app": {
+    "name": "Redmarc",
+    "tagline": "Modern interface for Redmine",
+    "connecting": "Synchronizing with Redmine...",
+    "connectionError": "Unable to connect to Redmine. Make sure you are logged in."
+  },
+  "sidebar": {
+    "allProjects": "All Projects",
+    "projects": "Projects",
+    "myWork": "My Work",
+    "addProject": "New project",
+    "noProjects": "No projects yet",
+    "pluginStatus": "Redmarc Plugin",
+    "administrator": "Administrator"
+  },
+  "header": {
+    "searchPlaceholder": "Search issues...",
+    "clearFilters": "Clear filters",
+    "createIssue": "Create issue",
+    "refresh": "Refresh",
+    "toggleTheme": "Toggle theme",
+    "openCommandPalette": "Command palette"
+  },
+  "views": {
+    "kanban": "Kanban",
+    "list": "List"
   },
   "kanban": {
-    "title": "Kanban Board",
-    "no_issues": "No issues found"
+    "backlog": "Backlog / New",
+    "inProgress": "In Progress",
+    "review": "Review / Test",
+    "done": "Done",
+    "noIssues": "No issues",
+    "addIssue": "Add issue"
+  },
+  "issue": {
+    "id": "ID",
+    "subject": "Subject",
+    "project": "Project",
+    "status": "Status",
+    "assignee": "Assignee",
+    "updated": "Updated",
+    "unassigned": "Unassigned",
+    "noDescription": "No description provided.",
+    "description": "Description",
+    "attachments": "Attachments",
+    "openInRedmine": "Open in Redmine",
+    "createdOn": "Created",
+    "priority": "Priority",
+    "dueDate": "Due date"
+  },
+  "createIssue": {
+    "title": "Create new issue",
+    "subjectLabel": "Issue subject",
+    "subjectPlaceholder": "Describe the issue briefly...",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Add detailed description... (paste images with Ctrl+V)",
+    "projectLabel": "Project",
+    "assigneeLabel": "Assignee",
+    "statusLabel": "Initial status",
+    "submit": "Create issue",
+    "cancel": "Cancel"
+  },
+  "createProject": {
+    "title": "Create new project",
+    "nameLabel": "Project name",
+    "namePlaceholder": "e.g. Frontend Redesign",
+    "identifierLabel": "Identifier",
+    "identifierPlaceholder": "auto-generated from name",
+    "identifierHint": "Lowercase letters, numbers and dashes only",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Brief project description...",
+    "submit": "Create project",
+    "cancel": "Cancel"
+  },
+  "deleteProject": {
+    "title": "Delete project",
+    "confirm": "Are you sure you want to delete",
+    "warning": "All issues in this project will also be permanently deleted. This cannot be undone.",
+    "submit": "Delete",
+    "cancel": "Cancel"
+  },
+  "commandPalette": {
+    "placeholder": "Search issues, projects or type a command...",
+    "noResults": "No results found.",
+    "groupIssues": "Issues",
+    "groupProjects": "Projects",
+    "groupActions": "Actions",
+    "groupRecent": "Recent",
+    "createIssue": "Create new issue",
+    "darkMode": "Switch to Dark mode",
+    "lightMode": "Switch to Light mode",
+    "filterByStatus": "Filter by status",
+    "filterByAssignee": "Filter by assignee",
+    "clearFilters": "Clear all filters"
+  },
+  "errors": {
+    "updateStatus": "Failed to update status. Changes reverted.",
+    "assignUser": "Failed to assign user. Changes reverted.",
+    "createIssue": "Failed to create issue",
+    "createProject": "Failed to create project",
+    "deleteProject": "Failed to delete project",
+    "uploadImage": "Image upload failed"
+  },
+  "shortcuts": {
+    "createIssue": "Create issue",
+    "createProject": "New project",
+    "refresh": "Refresh",
+    "commandMenu": "Command menu",
+    "deleteProject": "Delete project"
   }
 }
