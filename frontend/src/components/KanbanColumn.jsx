@@ -1,4 +1,6 @@
 import React from 'react';
+import { useDroppable } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { IssueCard } from './IssueCard';
 
 const PlusSmIcon = () => (
@@ -7,27 +9,36 @@ const PlusSmIcon = () => (
   </svg>
 );
 
-export function KanbanColumn({ title, dotClass, issues, onIssueClick, onAddIssue }) {
+export function KanbanColumn({ id, title, dotClass, issues, onIssueClick, onAddIssue }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id,
+    data: { col: id },
+  });
+
+  const issueIds = issues.map(issue => issue.id);
+
   return (
-    <div className="kanban-column">
+    <div className={`kanban-column ${isOver ? 'is-drag-over' : ''}`}>
       <div className="column-header">
         <span className={`column-title-dot ${dotClass}`} />
         <span className="column-title">{title}</span>
         <span className="column-count">{issues.length}</span>
       </div>
 
-      <div className="column-cards">
-        {issues.length === 0 ? (
-          <div className="column-empty-state">No issues</div>
-        ) : (
-          issues.map(issue => (
-            <IssueCard
-              key={issue.id}
-              issue={issue}
-              onClick={() => onIssueClick(issue)}
-            />
-          ))
-        )}
+      <div className="column-cards" ref={setNodeRef}>
+        <SortableContext items={issueIds} strategy={verticalListSortingStrategy}>
+          {issues.length === 0 ? (
+            <div className="column-empty-state">No issues</div>
+          ) : (
+            issues.map(issue => (
+              <IssueCard
+                key={issue.id}
+                issue={issue}
+                onClick={() => onIssueClick(issue)}
+              />
+            ))
+          )}
+        </SortableContext>
       </div>
 
       <button className="column-add-btn" onClick={onAddIssue}>

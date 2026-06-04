@@ -1,114 +1,125 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* ==========================================================================
-   Productive Dark 2.0 — default theme
-   Philosophy: comfort after 8 hours, not "wow at first glance"
+   DARK THEME — "Slate Studio"
+   Philosophy: no pure black, no neon, no blur. Mid-tone slate grays with a
+   warm blue undertone. Every surface has its own distinct shade so nothing
+   merges into the background. Accent is a calm desaturated sky-blue.
    ========================================================================== */
 :root {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   color-scheme: dark;
-  color: #e8eaf0;
-  background-color: #111318;
+  color: #d4d8e8;
+  background-color: #1e2130;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Backgrounds */
-  --bg-app: #111318;
-  --bg-sidebar: #161922;
-  --bg-surface: #1a1d24;
-  --bg-card: #21252e;
-  --bg-modal: rgba(22, 25, 34, 0.97);
-  --bg-input: rgba(0, 0, 0, 0.2);
-  --bg-column: rgba(26, 29, 36, 0.6);
-  --bg-sidebar-footer: rgba(0, 0, 0, 0.18);
+  /* ── Backgrounds (each layer is visibly distinct) ── */
+  --bg-app:          #1e2130;   /* outermost — dark slate-blue */
+  --bg-sidebar:      #252a3d;   /* sidebar — slightly lighter, blue-tinted */
+  --bg-surface:      #2c3149;   /* panels, drawers */
+  --bg-card:         #333a52;   /* cards — clearly above surface */
+  --bg-column:       #29304a;   /* kanban column bg — between sidebar and card */
+  --bg-modal:        #2c3149;   /* modal dialogs */
+  --bg-input:        rgba(255,255,255, 0.06);
+  --bg-hover:        rgba(255,255,255, 0.05);
+  --bg-sidebar-footer: rgba(0,0,0, 0.18);
 
-  /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-column: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(91, 106, 240, 0.55);
+  /* ── Borders — layered subtle visibility ── */
+  --border-subtle:   rgba(255,255,255, 0.09);
+  --border-column:   rgba(255,255,255, 0.10);
+  --border-focus:    rgba(108, 142, 191, 0.60);
 
-  /* Text */
-  --text-primary: #e8eaf0;
-  --text-secondary: #8892a4;
-  --text-muted: #505870;
+  /* ── Text ── */
+  --text-primary:   #d4d8e8;   /* warm light lavender-white */
+  --text-secondary: #8b91aa;   /* mid-tone blue-gray */
+  --text-muted:     #555d7a;   /* visible but subdued */
 
-  /* Accent — blue-violet, less aggressive than classic purple */
-  --color-accent: #5b6af0;
-  --color-accent-hover: #7280f5;
-  --color-accent-glow: rgba(91, 106, 240, 0.12);
+  /* ── Accent — desaturated sky blue (calm, professional) ── */
+  --color-accent:        #6c8ebf;
+  --color-accent-hover:  #7fa3d4;
+  --color-accent-glow:   rgba(108, 142, 191, 0.14);
 
-  /* Kanban column status colors */
-  --color-todo: #60a5fa;
-  --color-progress: #f59e0b;
-  --color-review: #a78bfa;
-  --color-done: #34d399;
-  --color-closed: #64748b;
+  /* ── Kanban status colors — muted, not neon ── */
+  --color-todo:     #7aa2c8;   /* soft blue */
+  --color-progress: #c89d5a;   /* amber-warm */
+  --color-review:   #9b7ec8;   /* muted purple */
+  --color-done:     #5aa88a;   /* desaturated teal-green */
+  --color-closed:   #5a6278;   /* gray */
 
-  /* Shadows — only on hover/active, not on rest state */
-  --shadow-card: none;
-  --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.35);
-  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
-  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.5);
+  /* ── Shadows — depth without glow ── */
+  --shadow-card:       none;
+  --shadow-card-hover: 0 4px 18px rgba(0,0,0, 0.35);
+  --shadow-premium:    0 10px 32px rgba(0,0,0, 0.45);
+  --shadow-modal:      0 20px 60px rgba(0,0,0, 0.55);
 
-  /* Radius */
+  /* ── Shape ── */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
 
-  /* Transitions */
+  /* ── Motion ── */
   --transition-smooth: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-spring: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Misc */
-  --modal-overlay-bg: rgba(5, 7, 12, 0.65);
-  --card-hover-bg: #262b36;
+  /* ── Misc ── */
+  --modal-overlay-bg: rgba(8, 10, 18, 0.70);
+  --card-hover-bg:    #3a4260;
 }
 
 /* ==========================================================================
-   Editorial Light 2.0 — independent design, NOT a dark theme inversion
-   Inspiration: Notion, Linear, GitHub
+   LIGHT THEME — "Warm Paper"
+   Philosophy: warm cream base (NOT white), high contrast borders for outdoor
+   readability, every element has its own distinct warm tone. Accent is ink-blue.
    ========================================================================== */
 body.light-theme {
   color-scheme: light;
-  --bg-app: #f4f5f7;
-  --bg-sidebar: #ebedf2;
-  --bg-surface: #f0f2f5;
-  --bg-card: #ffffff;
-  --bg-modal: rgba(255, 255, 255, 0.99);
-  --bg-input: rgba(0, 0, 0, 0.04);
-  --bg-column: rgba(220, 224, 234, 0.55);
-  --bg-sidebar-footer: rgba(0, 0, 0, 0.05);
 
-  --border-subtle: #e4e6ea;
-  --border-column: #dde0e8;
-  --border-focus: rgba(79, 82, 201, 0.55);
+  /* ── Backgrounds (warm cream palette, nothing is pure white except cards) ── */
+  --bg-app:          #ebe8e0;   /* warm parchment — overall background */
+  --bg-sidebar:      #e2ddd6;   /* sidebar — slightly darker warm */
+  --bg-surface:      #f0ede6;   /* panels, drawers — lightest warm */
+  --bg-card:         #faf8f4;   /* cards — off-white warm, clearly above surface */
+  --bg-column:       #dedad2;   /* kanban column — distinct warm gray */
+  --bg-modal:        #f5f2eb;   /* modals */
+  --bg-input:        rgba(0,0,0, 0.06);
+  --bg-hover:        rgba(0,0,0, 0.05);
+  --bg-sidebar-footer: rgba(0,0,0, 0.08);
 
-  --text-primary: #1a1d27;
-  --text-secondary: #5a6175;
-  --text-muted: #9099ae;
+  /* ── Borders — strong enough for outdoor/bright light ── */
+  --border-subtle:   #ccc8be;   /* solid warm border — clearly visible */
+  --border-column:   #c4c0b6;
+  --border-focus:    rgba(74, 111, 165, 0.55);
 
-  --color-accent: #4f52c9;
-  --color-accent-hover: #6366d4;
-  --color-accent-glow: rgba(79, 82, 201, 0.08);
+  /* ── Text ── */
+  --text-primary:   #2a2520;   /* warm near-black */
+  --text-secondary: #6a6055;   /* warm brown-gray */
+  --text-muted:     #9a9088;   /* readable muted warm */
 
-  --color-todo: #3b82f6;
-  --color-progress: #d97706;
-  --color-review: #7c3aed;
-  --color-done: #059669;
-  --color-closed: #6b7280;
+  /* ── Accent — ink blue (calm, anchored) ── */
+  --color-accent:        #4a6fa5;
+  --color-accent-hover:  #5a82ba;
+  --color-accent-glow:   rgba(74, 111, 165, 0.10);
 
-  /* Subtle editorial shadows — no neon */
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.10), 0 2px 4px rgba(0, 0, 0, 0.06);
-  --shadow-premium: 0 10px 30px -10px rgba(15, 23, 42, 0.12);
-  --shadow-modal: 0 20px 60px rgba(15, 23, 42, 0.16);
+  /* ── Kanban status colors — rich but not neon ── */
+  --color-todo:     #3d74b0;   /* solid blue */
+  --color-progress: #b5720a;   /* amber */
+  --color-review:   #6b45a8;   /* purple */
+  --color-done:     #1e8a5e;   /* forest green */
+  --color-closed:   #7a7068;   /* warm gray */
 
-  --modal-overlay-bg: rgba(15, 23, 42, 0.35);
-  --card-hover-bg: #f9fafb;
+  /* ── Shadows — crisp, editorial ── */
+  --shadow-card:       0 1px 4px rgba(0,0,0, 0.08), 0 1px 2px rgba(0,0,0, 0.05);
+  --shadow-card-hover: 0 4px 14px rgba(0,0,0, 0.14), 0 2px 4px rgba(0,0,0, 0.08);
+  --shadow-premium:    0 10px 30px rgba(0,0,0, 0.12);
+  --shadow-modal:      0 20px 60px rgba(0,0,0, 0.18);
+
+  --modal-overlay-bg: rgba(30, 25, 20, 0.45);
+  --card-hover-bg:    #f0ece3;
 }
 
 /* ==========================================================================
@@ -154,10 +165,10 @@ body {
    ========================================================================== */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.14); }
-body.light-theme ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.12); }
-body.light-theme ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.2); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255, 0.10); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255, 0.18); }
+body.light-theme ::-webkit-scrollbar-thumb { background: rgba(0,0,0, 0.15); }
+body.light-theme ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0, 0.25); }
 
 /* ==========================================================================
    Brand Logo
@@ -173,11 +184,15 @@ body.light-theme ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.2
   justify-content: center;
   flex-shrink: 0;
   margin-right: 4px;
-  border: 1px solid rgba(91, 106, 240, 0.2);
+  border: 1px solid rgba(108, 142, 191, 0.22);
+}
+
+body.light-theme .brand-logo-circle {
+  border-color: rgba(74, 111, 165, 0.22);
 }
 
 /* ==========================================================================
-   Buttons
+   Buttons — solid, no box-shadow glow
    ========================================================================== */
 .btn {
   display: inline-flex;
@@ -188,7 +203,7 @@ body.light-theme ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.2
   font-weight: 500;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255,255,255, 0.08);
   color: var(--text-primary) !important;
   cursor: pointer;
   transition: var(--transition-smooth);
@@ -198,40 +213,37 @@ body.light-theme ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.2
 }
 
 .btn:hover {
-  background: rgba(255, 255, 255, 0.10);
-  border-color: rgba(255, 255, 255, 0.13);
+  background: rgba(255,255,255, 0.13);
+  border-color: rgba(255,255,255, 0.15);
   transform: translateY(-1px);
 }
 
 .btn:active { transform: translateY(0); }
 
 body.light-theme .btn {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(0,0,0, 0.06);
   border-color: var(--border-subtle);
 }
 
 body.light-theme .btn:hover {
-  background: rgba(0, 0, 0, 0.07);
+  background: rgba(0,0,0, 0.10);
 }
 
 .btn-primary {
   background: var(--color-accent);
   border-color: transparent;
   color: #fff !important;
-  box-shadow: 0 2px 8px rgba(91, 106, 240, 0.25);
 }
 
 .btn-primary:hover {
   background: var(--color-accent-hover);
   border-color: transparent;
-  box-shadow: 0 4px 14px rgba(91, 106, 240, 0.38);
 }
 
 body.light-theme .btn-primary {
   background: var(--color-accent);
   border-color: transparent;
   color: #ffffff !important;
-  box-shadow: 0 2px 8px rgba(79, 82, 201, 0.25);
 }
 
 body.light-theme .btn-primary:hover {
@@ -240,30 +252,30 @@ body.light-theme .btn-primary:hover {
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.04);
+  background: transparent;
   border: 1px solid var(--border-subtle);
   color: var(--text-primary) !important;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255, 0.07);
 }
 
 body.light-theme .btn-secondary {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.10);
+  background: transparent;
+  border-color: var(--border-subtle);
 }
 
 body.light-theme .btn-secondary:hover {
-  background: rgba(0, 0, 0, 0.07);
+  background: rgba(0,0,0, 0.06);
 }
 
 .btn-icon {
   width: 32px;
   height: 32px;
   padding: 0;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255, 0.06);
+  border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
   display: inline-flex;
@@ -272,30 +284,35 @@ body.light-theme .btn-secondary:hover {
 }
 
 .btn-icon:hover {
-  background: rgba(255, 255, 255, 0.10);
-  border-color: rgba(255, 255, 255, 0.13);
+  background: rgba(255,255,255, 0.11);
+  border-color: rgba(255,255,255, 0.15);
   color: var(--text-primary);
   transform: translateY(0);
 }
 
 body.light-theme .btn-icon {
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.09);
+  background: rgba(0,0,0, 0.06);
+  border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
 }
 
 body.light-theme .btn-icon:hover {
-  background: rgba(0, 0, 0, 0.09);
+  background: rgba(0,0,0, 0.10);
   color: var(--text-primary);
 }
 
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
 /* ==========================================================================
-   Glassmorphism — Command Palette ONLY
+   Command Palette backdrop — minimal blur only here
    ========================================================================== */
 .glass-panel {
-  background: rgba(22, 25, 34, 0.96);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: rgba(37, 42, 61, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-subtle);
 }
 
@@ -303,11 +320,10 @@ body.light-theme .glass-panel {
   background: var(--bg-modal);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border: 1px solid rgba(0, 0, 0, 0.09);
+  border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-modal);
 }
 
-/* Modal panels (non-command-palette) — solid, no blur */
 .modal-panel {
   background: var(--bg-modal);
   border: 1px solid var(--border-subtle);
@@ -317,7 +333,7 @@ body.light-theme .glass-panel {
 
 body.light-theme .modal-panel {
   background: var(--bg-modal);
-  border-color: rgba(0, 0, 0, 0.09);
+  border-color: var(--border-subtle);
 }
 
 /* ==========================================================================
@@ -330,27 +346,26 @@ kbd {
   padding: 2px 6px;
   font-size: 10px;
   font-family: monospace;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255,255,255, 0.08);
+  border: 1px solid rgba(255,255,255, 0.14);
   border-radius: 4px;
   color: var(--text-secondary);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
 }
 
 body.light-theme kbd {
-  background: rgba(0, 0, 0, 0.06);
-  border-color: rgba(0, 0, 0, 0.14);
+  background: rgba(0,0,0, 0.07);
+  border-color: rgba(0,0,0, 0.16);
 }
 
 /* ==========================================================================
-   Sidebar section shading
+   Sidebar section shading — each sub-zone has its own tone
    ========================================================================== */
-.app-sidebar .brand-header { background: rgba(0, 0, 0, 0.10); }
-body.light-theme .app-sidebar .brand-header { background: rgba(0, 0, 0, 0.05); }
-.app-sidebar .sidebar-footer { background: rgba(0, 0, 0, 0.14); }
-body.light-theme .app-sidebar .sidebar-footer { background: rgba(0, 0, 0, 0.06); }
-.app-sidebar .sidebar-hotkeys { background: rgba(0, 0, 0, 0.10); }
-body.light-theme .app-sidebar .sidebar-hotkeys { background: rgba(0, 0, 0, 0.04); }
+.app-sidebar .brand-header { background: rgba(0,0,0, 0.14); }
+body.light-theme .app-sidebar .brand-header { background: rgba(0,0,0, 0.06); }
+.app-sidebar .sidebar-footer { background: rgba(0,0,0, 0.18); }
+body.light-theme .app-sidebar .sidebar-footer { background: rgba(0,0,0, 0.08); }
+.app-sidebar .sidebar-hotkeys { background: rgba(0,0,0, 0.10); }
+body.light-theme .app-sidebar .sidebar-hotkeys { background: rgba(0,0,0, 0.05); }
 
 /* ==========================================================================
    Error Boundary
@@ -369,7 +384,7 @@ body.light-theme .app-sidebar .sidebar-hotkeys { background: rgba(0, 0, 0, 0.04)
 .error-boundary-title {
   font-size: 20px;
   font-weight: 700;
-  color: #ef4444;
+  color: #d95555;
 }
 
 .error-boundary-message {
@@ -382,7 +397,7 @@ body.light-theme .app-sidebar .sidebar-hotkeys { background: rgba(0, 0, 0, 0.04)
 .error-boundary-retry { margin-top: 8px; }
 
 /* ==========================================================================
-   Command Palette (cmdk)
+   Command Palette
    ========================================================================== */
 [cmdk-dialog] {
   position: fixed;
@@ -399,8 +414,8 @@ body.light-theme .app-sidebar .sidebar-hotkeys { background: rgba(0, 0, 0, 0.04)
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(4px);
+  background: rgba(0,0,0, 0.50);
+  backdrop-filter: blur(3px);
   z-index: -1;
   animation: fadeIn 0.15s ease-out forwards;
 }
@@ -410,7 +425,7 @@ body.light-theme .app-sidebar .sidebar-hotkeys { background: rgba(0, 0, 0, 0.04)
   max-width: 580px;
   border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--border-subtle);
+  box-shadow: 0 16px 48px rgba(0,0,0, 0.55), 0 0 0 1px var(--border-subtle);
   animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -469,13 +484,7 @@ body.light-theme .app-sidebar .sidebar-hotkeys { background: rgba(0, 0, 0, 0.04)
 
 .cmdk-item[data-selected='true'],
 .cmdk-item:hover {
-  background: rgba(91, 106, 240, 0.10);
-  color: var(--color-accent);
-}
-
-body.light-theme .cmdk-item[data-selected='true'],
-body.light-theme .cmdk-item:hover {
-  background: rgba(79, 82, 201, 0.07);
+  background: var(--color-accent-glow);
   color: var(--color-accent);
 }
 
@@ -490,11 +499,15 @@ body.light-theme .cmdk-item:hover {
   align-items: center;
   justify-content: center;
   width: 22px; height: 22px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255,255,255, 0.06);
   border-radius: 5px;
   font-size: 12px;
   color: var(--text-secondary);
   flex-shrink: 0;
+}
+
+body.light-theme .cmdk-action-icon {
+  background: rgba(0,0,0, 0.06);
 }
 
 .cmdk-separator {
@@ -503,9 +516,9 @@ body.light-theme .cmdk-item:hover {
   margin: 4px 0;
 }
 
-.cmdk-reset { color: #f87171; }
+.cmdk-reset { color: #d95555; }
 .cmdk-reset[data-selected='true'],
-.cmdk-reset:hover { background: rgba(239, 68, 68, 0.08); color: #ef4444; }
+.cmdk-reset:hover { background: rgba(217, 85, 85, 0.09); color: #d95555; }
 
 /* ==========================================================================
    Animations

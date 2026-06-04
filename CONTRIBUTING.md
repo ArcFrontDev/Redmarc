@@ -1,43 +1,97 @@
 # Contributing to Redmarc
 
-First off, thank you for considering contributing to Redmarc! It's people like you that make Redmarc such a great tool.
+Thank you for your interest in contributing to Redmarc. Every improvement matters — whether it is a bug report, a design suggestion, or a pull request.
+
+---
 
 ## Code of Conduct
 
-By participating in this project, you agree to abide by our Code of Conduct. We expect all contributors to maintain a welcoming and inclusive environment.
+Be respectful. We maintain a welcoming environment for contributors of all backgrounds and skill levels. Harassment of any kind will not be tolerated.
 
-## How Can I Contribute?
+---
+
+## How to Contribute
 
 ### Reporting Bugs
 
-This section guides you through submitting a bug report. Following these guidelines helps maintainers understand your report, reproduce the behavior, and find related reports.
+- Search existing issues first to avoid duplicates.
+- Use a clear, descriptive title.
+- Include steps to reproduce, expected behavior, and actual behavior.
+- Attach screenshots or screen recordings when relevant.
+- Mention your Redmine version and browser.
 
-* Use a clear and descriptive title for the issue.
-* Describe the exact steps which reproduce the problem in as many details as possible.
-* Provide specific examples to demonstrate the steps.
+### Suggesting Features
 
-### Suggesting Enhancements
-
-This section guides you through submitting an enhancement suggestion, including completely new features and minor improvements to existing functionality.
-
-* Use a clear and descriptive title for the issue.
-* Provide a step-by-step description of the suggested enhancement in as many details as possible.
-* Explain why this enhancement would be useful.
+- Open an issue with the `enhancement` label.
+- Describe the use case — why would this be useful to other Redmine users?
+- If you have a design idea, sketches or mockups are very welcome.
 
 ### Pull Requests
 
-* Fill in the required template.
-* Do not include issue numbers in the PR title.
-* Include screenshots and animated GIFs in your pull request whenever possible.
-* End files with a newline.
+- Fork the repository and create a feature branch: `git checkout -b feat/your-feature`
+- Keep pull requests focused — one feature or fix per PR.
+- Include screenshots in the PR description if you changed the UI.
+- Make sure the frontend builds without errors: `npm run build`
+- End all files with a newline.
+
+---
 
 ## Development Setup
 
-If you want to contribute code to the frontend React application:
-1. Navigate to the `frontend` folder: `cd frontend`
-2. Install dependencies: `npm install`
-3. Run the development server: `npm run dev`
+### Backend (Rails plugin)
 
-Make sure your `api.js` points to your Redmine backend during development.
+The backend is minimal. The main files are:
 
-Thank you!
+```
+app/controllers/redmarc_controller.rb  — single controller, renders the SPA
+config/routes.rb                       — registers /redmarc route
+init.rb                                — plugin registration
+```
+
+### Frontend (React + Vite)
+
+```bash
+cd frontend
+npm install
+npm run dev      # development server on :5173
+npm run build    # production build → ../assets/
+```
+
+The built assets are committed to the repository so that users can install the plugin without a Node.js environment.
+
+### Project Structure
+
+```
+frontend/
+  src/
+    components/     # UI components (KanbanBoard, IssueCard, IssueDetailPanel, ...)
+    hooks/          # Custom React hooks (useAppData, useDragAndDrop, ...)
+    utils/          # API client, status mapping, helpers
+    App.jsx         # Root orchestrator
+    index.css       # Design tokens and theme definitions
+    App.css         # Component-level styles
+```
+
+---
+
+## Commit Style
+
+We follow a simple conventional commit format:
+
+```
+type: short description in present tense
+```
+
+Types: `feat`, `fix`, `refact`, `chore`, `docs`, `style`
+
+Examples:
+```
+feat: add drag-and-drop between kanban columns
+fix: resolve status id mismatch on issue move
+refact: extract pagination logic into hook
+docs: update installation steps for Redmine 5.1
+```
+
+---
+
+Thank you for helping make Redmine better.

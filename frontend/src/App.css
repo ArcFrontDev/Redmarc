@@ -52,7 +52,7 @@
   letter-spacing: 0.8px;
   color: var(--color-accent);
   background: var(--color-accent-glow);
-  border: 1px solid rgba(91, 106, 240, 0.22);
+  border: 1px solid var(--border-subtle);
   border-radius: 4px;
   padding: 1px 5px;
   margin-left: auto;
@@ -316,7 +316,6 @@ body.light-theme .nav-item-count {
 .header-search-bar:focus-within {
   border-color: var(--border-focus);
   background: var(--bg-input);
-  box-shadow: 0 0 0 2px var(--color-accent-glow);
 }
 
 .search-input {
@@ -414,7 +413,6 @@ body.light-theme .view-btn:hover { background: rgba(0, 0, 0, 0.05); }
 .view-btn.active {
   background: var(--color-accent);
   color: #fff;
-  box-shadow: 0 0 8px rgba(91, 106, 240, 0.28);
 }
 
 .view-btn.active:hover {
@@ -604,7 +602,7 @@ body.light-theme .column-empty-state {
 }
 
 .issue-card:hover {
-  border-color: rgba(255, 255, 255, 0.13);
+  border-color: rgba(255, 255, 255, 0.15);
   transform: translateY(-1px);
   box-shadow: var(--shadow-card-hover);
 }
@@ -614,7 +612,7 @@ body.light-theme .issue-card {
 }
 
 body.light-theme .issue-card:hover {
-  border-color: rgba(0, 0, 0, 0.12);
+  border-color: var(--color-accent);
   box-shadow: var(--shadow-card-hover);
 }
 
@@ -1042,8 +1040,30 @@ body.light-theme .close-modal-btn:hover {
 
 .text-sm { font-size: 12px; }
 
+/* Shared field styles for drawer sidebar */
+.details-select,
+.details-input {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  padding: 6px 10px;
+  width: 100%;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.details-select:focus,
+.details-input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+/* legacy alias */
 .details-select-status {
-  background: var(--bg-input);
+  background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
@@ -1058,7 +1078,6 @@ body.light-theme .close-modal-btn:hover {
 .details-select-status:focus {
   outline: none;
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 2px var(--color-accent-glow);
 }
 
 .redmine-link-info {
@@ -1137,9 +1156,20 @@ body.light-theme .close-modal-btn:hover {
 }
 
 .form-group input,
-.form-group textarea,
-.form-group select {
+.form-group textarea {
   background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 13px;
+  padding: 8px 12px;
+  font-family: inherit;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+
+.form-group select {
+  background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
@@ -1155,7 +1185,6 @@ body.light-theme .close-modal-btn:hover {
 .form-group select:focus {
   outline: none;
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 2px var(--color-accent-glow);
 }
 
 .form-group textarea {
@@ -1238,3 +1267,165 @@ body.light-theme .context-menu-item:hover { background: rgba(0, 0, 0, 0.04); }
 
 .context-menu-danger { color: #f87171; }
 .context-menu-danger:hover { background: rgba(239, 68, 68, 0.09) !important; color: #ef4444; }
+
+/* ── Inline editing ── */
+.editable {
+  cursor: pointer;
+  transition: background 0.2s;
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  margin: -4px;
+}
+.editable:hover { background: var(--bg-hover); }
+
+.details-title-input {
+  width: 100%;
+  font-size: 18px;
+  font-weight: 600;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-focus);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-family: inherit;
+  margin-bottom: 12px;
+}
+
+.details-description-textarea {
+  width: 100%;
+  font-size: 13px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-family: inherit;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.details-description-textarea:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+/* ── Edit action buttons row ── */
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.mt-2 { margin-top: 8px; }
+
+/* ── Activity / Journal ── */
+.journal-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.journal-entry {
+  padding-left: 12px;
+  border-left: 2px solid var(--border-subtle);
+}
+
+.journal-header {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 5px;
+  flex-wrap: wrap;
+}
+
+.journal-user {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.journal-date {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.journal-notes {
+  font-size: 13px;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+  line-height: 1.55;
+}
+
+.journal-details-list {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.journal-loading,
+.journal-empty {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Comment box ── */
+.comment-box {
+  margin-top: 4px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ── Textile rendered content ── */
+.textile-body {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+.textile-body .textile-h {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 10px 0 4px;
+}
+
+.textile-body .textile-code {
+  font-family: monospace;
+  font-size: 12px;
+  background: rgba(255,255,255, 0.07);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--color-accent);
+}
+
+body.light-theme .textile-body .textile-code {
+  background: rgba(0,0,0, 0.07);
+}
+
+.textile-body .textile-quote {
+  border-left: 3px solid var(--border-subtle);
+  padding-left: 10px;
+  margin: 4px 0;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.textile-body .textile-link {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.textile-body .textile-link:hover {
+  text-decoration: underline;
+}
+
+.textile-body .textile-li {
+  margin-left: 16px;
+  list-style: disc;
+  display: list-item;
+}
+
