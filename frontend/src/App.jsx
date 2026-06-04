@@ -16,6 +16,7 @@ import CommandPalette from './components/CommandPalette';
 import { useAppData } from './hooks/useAppData';
 import { useTheme } from './hooks/useTheme';
 import { useKeyboard } from './hooks/useKeyboard';
+import { useDragAndDrop } from './hooks/useDragAndDrop';
 import { groupIssuesByColumn } from './utils/statusMapping';
 
 function App() {
@@ -49,7 +50,6 @@ function App() {
 
   const isAnyModalOpen = isCreateIssueOpen || isCreateProjectOpen || deleteConfirm.isOpen;
 
-  // Close all overlays
   const closeAll = useCallback(() => {
     setSelectedIssue(null);
     setIsCommandOpen(false);
@@ -64,7 +64,6 @@ function App() {
     openDeleteConfirm(project);
   }, [openDeleteConfirm]);
 
-  // Keyboard shortcuts
   useKeyboard({
     onCreateIssue:          () => setIsCreateIssueOpen(true),
     onCreateProject:        () => setIsCreateProjectOpen(true),
@@ -76,6 +75,25 @@ function App() {
     projects,
     isAnyModalOpen,
   });
+
+  const handleUpdateStatus = useCallback((issueId, statusId) => {
+    updateIssueStatus(issueId, statusId, statuses).catch(() => {});
+    if (selectedIssue?.id === issueId) {
+      const s = statuses.find(st => st.id === parseInt(statusId));
+      if (s) setSelectedIssue(prev => ({ ...prev, status: { id: s.id, name: s.name } }));
+    }
+  }, [updateIssueStatus, statuses, selectedIssue]);
+
+  const handleAssignUser = useCallback((issueId, userId) => {
+    assignUser(issueId, userId, users).catch(() => {});
+    if (selectedIssue?.id === issueId) {
+      const u = users.find(u => u.id === parseInt(userId));
+      const assignee = u
+        ? { id: u.id, name: u.name || `${u.firstname} ${u.lastname}`.trim() || u.login }
+        : null;
+      setSelectedIssue(prev => ({ ...prev, assigned_to: assignee }));
+    }
+  }, [assignUser, users, selectedIssue]);
 
   // Filter issues
   const filteredIssues = useMemo(() => {
@@ -94,28 +112,24 @@ function App() {
     });
   }, [issues, activeProject, searchQuery, filterUser, filterStatus]);
 
-  const groupedIssues = useMemo(() => groupIssuesByColumn(filteredIssues), [filteredIssues]);
+  // Base grouped (no sort order) — needed by DnD hook
+  const baseGrouped = useMemo(
+    () => groupIssuesByColumn(filteredIssues, {}),
+    [filteredIssues]
+  );
 
-  // Status / assignee handlers wiring statuses/users into the hook
-  const handleUpdateStatus = useCallback((issueId, statusId) => {
-    updateIssueStatus(issueId, statusId, statuses).catch(() => {});
-    // Also refresh selectedIssue if it matches
-    if (selectedIssue?.id === issueId) {
-      const s = statuses.find(st => st.id === parseInt(statusId));
-      if (s) setSelectedIssue(prev => ({ ...prev, status: { id: s.id, name: s.name } }));
-    }
-  }, [updateIssueStatus, statuses, selectedIssue]);
+  // DnD hook — owns sort order + handleDragEnd
+  const { sortOrder, handleDragEnd } = useDragAndDrop({
+    groupedIssues: baseGrouped,
+    statuses,
+    handleUpdateStatus,
+  });
 
-  const handleAssignUser = useCallback((issueId, userId) => {
-    assignUser(issueId, userId, users).catch(() => {});
-    if (selectedIssue?.id === issueId) {
-      const u = users.find(u => u.id === parseInt(userId));
-      const assignee = u
-        ? { id: u.id, name: u.name || `${u.firstname} ${u.lastname}`.trim() || u.login }
-        : null;
-      setSelectedIssue(prev => ({ ...prev, assigned_to: assignee }));
-    }
-  }, [assignUser, users, selectedIssue]);
+  // Final grouped with sort order applied
+  const groupedIssues = useMemo(
+    () => groupIssuesByColumn(filteredIssues, sortOrder),
+    [filteredIssues, sortOrder]
+  );
 
   const handleCreateIssue = useCallback(async issueData => {
     await createIssue(issueData);
@@ -131,13 +145,15 @@ function App() {
     setDeleteConfirm({ isOpen: false, project: null });
   }, [deleteProject, deleteConfirm.project, activeProject]);
 
-  // Default project id for create issue modal
+  const handleIssueUpdated = useCallback(() => {
+    loadData();
+  }, [loadData]);
+
   const defaultProjectId = activeProject !== 'all' ? activeProject : projects[0]?.id || '';
 
   return (
     <ErrorBoundary>
       <div className="app-container">
-        {/* Sidebar */}
         <Sidebar
           projects={projects}
           activeProject={activeProject}
@@ -148,12 +164,9 @@ function App() {
             openDeleteConfirm(proj);
           }}
           issues={issues}
-          theme={theme}
-          onToggleTheme={toggleTheme}
           loading={loading}
         />
 
-        {/* Main workspace */}
         <main className="app-workspace">
           <AppHeader
             activeProject={activeProject}
@@ -173,7 +186,6 @@ function App() {
             loading={loading}
           />
 
-          {/* Error state */}
           {error && (
             <div className="error-panel">
               <div className="error-icon">⚠️</div>
@@ -185,7 +197,6 @@ function App() {
             </div>
           )}
 
-          {/* Loading state */}
           {loading && (
             <div className="loading-container">
               <div className="loader-spinner" />
@@ -193,16 +204,15 @@ function App() {
             </div>
           )}
 
-          {/* Kanban view */}
           {!loading && !error && view === 'kanban' && (
             <KanbanBoard
               groupedIssues={groupedIssues}
               onIssueClick={setSelectedIssue}
               onAddIssue={() => setIsCreateIssueOpen(true)}
+              onDragEnd={handleDragEnd}
             />
           )}
 
-          {/* List view */}
           {!loading && !error && view === 'list' && (
             <ListView
               issues={filteredIssues}
@@ -210,7 +220,6 @@ function App() {
             />
           )}
 
-          {/* Command palette */}
           {isCommandOpen && (
             <CommandPalette
               open={isCommandOpen}
@@ -230,7 +239,6 @@ function App() {
           )}
         </main>
 
-        {/* Right-side issue detail drawer */}
         <IssueDetailPanel
           issue={selectedIssue}
           statuses={statuses}
@@ -238,9 +246,9 @@ function App() {
           onClose={() => setSelectedIssue(null)}
           onUpdateStatus={handleUpdateStatus}
           onAssignUser={handleAssignUser}
+          onIssueUpdated={handleIssueUpdated}
         />
 
-        {/* Create Issue modal */}
         {isCreateIssueOpen && (
           <CreateIssueModal
             projects={projects}
@@ -253,7 +261,6 @@ function App() {
           />
         )}
 
-        {/* Create Project modal */}
         {isCreateProjectOpen && (
           <CreateProjectModal
             onSubmit={handleCreateProject}
@@ -261,7 +268,6 @@ function App() {
           />
         )}
 
-        {/* Delete Confirm modal */}
         {deleteConfirm.isOpen && (
           <DeleteConfirmModal
             projectName={deleteConfirm.project?.name || ''}
@@ -270,7 +276,6 @@ function App() {
           />
         )}
 
-        {/* Context menu (right-click on project) */}
         {contextMenu.visible && (
           <ContextMenu
             x={contextMenu.x}
