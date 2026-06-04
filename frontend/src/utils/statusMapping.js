@@ -78,11 +78,26 @@ export function formatStatusName(statusName) {
  * @param {Array} issues - flat array of Redmine issue objects
  * @returns {{ todo: Array, progress: Array, review: Array, done: Array }}
  */
-export function groupIssuesByColumn(issues) {
+export function groupIssuesByColumn(issues, sortOrder = {}) {
   const columns = { todo: [], progress: [], review: [], done: [] };
   for (const issue of issues) {
     const col = getColumnForStatus(issue.status?.name);
     columns[col].push(issue);
+  }
+  
+  // Sort each column according to sortOrder if provided
+  for (const col of Object.keys(columns)) {
+    const order = sortOrder[col] || [];
+    if (order.length > 0) {
+      columns[col].sort((a, b) => {
+        const indexA = order.indexOf(a.id);
+        const indexB = order.indexOf(b.id);
+        if (indexA === -1 && indexB === -1) return 0;
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+      });
+    }
   }
   return columns;
 }

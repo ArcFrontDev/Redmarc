@@ -32,17 +32,14 @@ async function request(endpoint, options = {}) {
 export const api = {
   /**
    * Fetch issues with optional filters. Supports pagination via limit/offset.
-   * Default: fetch up to 100 issues with all statuses.
    */
   getIssues: (params = {}) => {
     const query = new URLSearchParams();
-    // Always include attachments
     if (!params.include) {
       params.include = 'attachments';
     } else if (!params.include.includes('attachments')) {
       params.include += ',attachments';
     }
-    // Default pagination
     if (!params.limit) params.limit = 100;
     if (params.offset === undefined) params.offset = 0;
 
@@ -61,6 +58,21 @@ export const api = {
   updateIssue: (id, issueData) =>
     request(`/issues/${id}.json`, { method: 'PUT', body: JSON.stringify({ issue: issueData }) }),
 
+  /**
+   * Fetch full issue details including journals and attachments.
+   */
+  getIssueDetails: (id) => request(`/issues/${id}.json?include=journals,attachments`),
+
+  /**
+   * Add a comment (note) to an issue.
+   * In the Redmine API, notes are added via PUT with the notes field.
+   */
+  addComment: (id, notes) =>
+    request(`/issues/${id}.json`, {
+      method: 'PUT',
+      body: JSON.stringify({ issue: { notes } }),
+    }),
+
   getProjects: () => request('/projects.json'),
 
   createProject: (projectData) =>
@@ -77,14 +89,12 @@ export const api = {
   getUsers: () => request('/users.json'),
 
   /**
-   * Fetch current user membership/info without admin rights.
-   * Used as a fallback when getUsers() fails.
+   * Fetch current user info without admin rights.
    */
   getCurrentUser: () => request('/users/current.json'),
 
   /**
    * Upload a file attachment. Returns { token } on success.
-   * Redmine API response shape: { upload: { token: "..." } }
    */
   uploadAttachment: async (file) => {
     const response = await fetch(`${API_BASE}/uploads.json`, {
@@ -98,7 +108,6 @@ export const api = {
       throw new Error(err.error || `HTTP ${response.status}`);
     }
     const data = await response.json();
-    // data.upload.token is the correct path per the Redmine API spec
     return { token: data.upload?.token || data.token };
   },
 };

@@ -2,6 +2,27 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../utils/api';
 
+/**
+ * Fetches ALL issues from Redmine by paginating through the API.
+ * Redmine returns at most `limit` issues per request; we loop until we have everything.
+ */
+async function fetchAllIssues(params = {}) {
+  const BATCH = 100;
+  let offset = 0;
+  let all = [];
+  let total = null;
+
+  do {
+    const data = await api.getIssues({ ...params, limit: BATCH, offset });
+    const items = data.issues || [];
+    all = all.concat(items);
+    if (total === null) total = data.total_count ?? items.length;
+    offset += BATCH;
+  } while (offset < total);
+
+  return all;
+}
+
 export function useAppData() {
   const [issues, setIssues] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -14,20 +35,19 @@ export function useAppData() {
     try {
       setLoading(true);
       setError(null);
-      const [projectsData, statusesData, issuesData] = await Promise.all([
+      const [projectsData, statusesData, allIssues] = await Promise.all([
         api.getProjects(),
         api.getStatuses(),
-        api.getIssues({ status_id: '*', limit: 100, offset: 0 })
+        fetchAllIssues({ status_id: '*' }),
       ]);
       setProjects(projectsData.projects || []);
       setStatuses(statusesData.issue_statuses || []);
-      setIssues(issuesData.issues || []);
-      // Users require admin rights - fetch separately and fail gracefully
+      setIssues(allIssues);
       try {
         const usersData = await api.getUsers();
         setUsers(usersData.users || []);
       } catch {
-        // Non-admin users cannot list all users - this is expected
+        // Non-admin users cannot list all users — expected
         setUsers([]);
       }
     } catch (err) {
@@ -74,29 +94,29 @@ export function useAppData() {
 
   const createIssue = useCallback(async (issueData) => {
     await api.createIssue(issueData);
-    const updated = await api.getIssues({ status_id: '*', limit: 100, offset: 0 });
-    setIssues(updated.issues || []);
+    const allIssues = await fetchAllIssues({ status_id: '*' });
+    setIssues(allIssues);
   }, []);
 
   const createProject = useCallback(async (projectData) => {
     await api.createProject(projectData);
-    const [pData, iData] = await Promise.all([
+    const [pData, allIssues] = await Promise.all([
       api.getProjects(),
-      api.getIssues({ status_id: '*', limit: 100, offset: 0 })
+      fetchAllIssues({ status_id: '*' }),
     ]);
     setProjects(pData.projects || []);
-    setIssues(iData.issues || []);
+    setIssues(allIssues);
   }, []);
 
   const deleteProject = useCallback(async (projectId, activeProject, setActiveProject) => {
     await api.deleteProject(projectId);
     if (activeProject === String(projectId)) setActiveProject('all');
-    const [pData, iData] = await Promise.all([
+    const [pData, allIssues] = await Promise.all([
       api.getProjects(),
-      api.getIssues({ status_id: '*', limit: 100, offset: 0 })
+      fetchAllIssues({ status_id: '*' }),
     ]);
     setProjects(pData.projects || []);
-    setIssues(iData.issues || []);
+    setIssues(allIssues);
   }, []);
 
   const uploadAttachment = useCallback(async (file) => {
