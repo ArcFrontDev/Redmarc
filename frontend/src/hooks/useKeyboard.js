@@ -29,7 +29,7 @@ export function useKeyboard({
     if (!groupedIssues) return;
 
     if (!focusedCard) {
-      // No focus yet — land on first card in first non-empty column
+      // No focus yet – land on first card in first non-empty column
       for (const col of COL_ORDER) {
         const cards = groupedIssues[col] || [];
         if (cards.length > 0) {
@@ -76,101 +76,100 @@ export function useKeyboard({
       const tag = document.activeElement.tagName;
       const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
 
-      // ── Always-on shortcuts ────────────────────────────────────────────────
-      // Ctrl+K — command palette
+      // Always-on shortcuts
+      // Ctrl+K – command palette
       if ((e.ctrlKey || e.metaKey) && e.code === 'KeyK') {
         e.preventDefault();
         onToggleCommandPalette();
         return;
       }
 
-      // Escape — close everything
+      // Escape – close everything
       if (e.key === 'Escape') {
         onCloseAll();
         setFocusedCard(null);
         return;
       }
 
-      // ── Shortcuts blocked in inputs ────────────────────────────────────────
+      // Shortcuts blocked in inputs
       if (isInput) return;
 
-      // C — create issue
+      // C – create issue
       if (e.code === 'KeyC' && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
         e.preventDefault(); onCreateIssue(); return;
       }
 
-      // P — create project
+      // P – create project
       if (e.code === 'KeyP' && !e.ctrlKey && !e.metaKey) {
         e.preventDefault(); onCreateProject(); return;
       }
 
-      // R — refresh
+      // R – refresh
       if (e.code === 'KeyR' && !e.ctrlKey && !e.metaKey) {
         e.preventDefault(); onRefresh(); return;
       }
 
-      // V — toggle view (kanban ↔ list)
+      // V – toggle view (kanban ↔ list)
       if (e.code === 'KeyV' && !e.ctrlKey && !e.metaKey) {
         e.preventDefault(); onToggleView?.(); return;
       }
 
-      // F — focus search
+      // F – focus search
       if (e.code === 'KeyF' && !e.ctrlKey && !e.metaKey) {
         e.preventDefault(); onFocusSearch?.(); return;
       }
 
-      // ? — hotkeys modal
+      // ? – hotkeys modal
       if (e.key === '?' && !e.ctrlKey && !e.metaKey) {
         e.preventDefault(); onOpenHotkeys?.(); return;
       }
 
-      // ── Card navigation ────────────────────────────────────────────────────
-      // J or ArrowDown — move focus down
+      // Card navigation
+      // J or ArrowDown – move focus down
       if ((e.code === 'KeyJ' || e.code === 'ArrowDown') && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
         e.preventDefault(); navigate('down'); return;
       }
 
-      // K or ArrowUp — move focus up
+      // K or ArrowUp – move focus up
       if ((e.code === 'KeyK' || e.code === 'ArrowUp') && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
         e.preventDefault(); navigate('up'); return;
       }
 
-      // L or ArrowRight — move focus right (next column)
+      // L or ArrowRight – move focus right (next column)
       if ((e.code === 'KeyL' || e.code === 'ArrowRight') && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
         e.preventDefault(); navigate('right'); return;
       }
 
-      // H or ArrowLeft — move focus left (prev column)
+      // H or ArrowLeft – move focus left (prev column)
       if ((e.code === 'KeyH' || e.code === 'ArrowLeft') && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
         e.preventDefault(); navigate('left'); return;
       }
 
-      // Enter or Space — open focused card
+      // Enter or Space – open focused card
       if ((e.code === 'Enter' || e.code === 'Space') && focusedCard) {
         e.preventDefault();
         onOpenFocusedCard?.();
         return;
       }
 
-      // ── Quick actions on focused card ──────────────────────────────────────
       if (focusedCard) {
-        // A — quick assign
+        // A – quick assign
         if (e.code === 'KeyA' && !e.ctrlKey && !e.metaKey) {
           e.preventDefault(); onQuickAssign?.(); return;
         }
 
-        // S — quick status
+        // S – quick status
         if (e.code === 'KeyS' && !e.ctrlKey && !e.metaKey) {
           e.preventDefault(); onQuickStatus?.(); return;
         }
 
-        // E — edit title
+        // E – edit title
         if (e.code === 'KeyE' && !e.ctrlKey && !e.metaKey) {
           e.preventDefault(); onQuickEdit?.(); return;
         }
       }
 
-      // Delete — delete active project (only when no card focused)
+      // Delete – delete active project (only when no card focused)
       if (
         e.code === 'Delete' &&
         !e.ctrlKey && !e.metaKey &&

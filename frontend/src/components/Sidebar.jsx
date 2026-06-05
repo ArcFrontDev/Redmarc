@@ -69,7 +69,7 @@ export function Sidebar({
                 e.preventDefault();
                 onDeleteProject(proj);
               }}
-              title={`${proj.name} — right-click to delete`}
+              title={`${proj.name} – right-click to delete`}
             >
               <FolderIcon />
               <span className="nav-item-text">{proj.name}</span>

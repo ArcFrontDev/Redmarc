@@ -5,18 +5,18 @@ import { CSS } from '@dnd-kit/utilities';
 
 // Priority color map (left strip + badge)
 const PRIORITY_COLORS = {
-  1: '#6b7280', // Low     — grey
-  2: '#4d8fbd', // Normal  — slate-blue
-  3: '#d49a3a', // High    — amber
-  4: '#d95555', // Urgent  — red
-  5: '#b52a2a', // Immediate — deep red
+  1: '#6b7280', // Low     – grey
+  2: '#4d8fbd', // Normal  – slate-blue
+  3: '#d49a3a', // High    – amber
+  4: '#d95555', // Urgent  – red
+  5: '#b52a2a', // Immediate – deep red
 };
 
-// Status column dot colors — clearly distinct from each other
+// Status column dot colors – clearly distinct from each other
 const STATUS_DOT_COLORS = {
   todo:     '#6b8fb5', // slate blue
   progress: '#c49040', // amber-gold
-  review:   '#d07040', // warm orange — clearly different from todo blue
+  review:   '#d07040', // warm orange – clearly different from todo blue
   done:     '#3daa74', // teal-green
 };
 

@@ -1,10 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* ==========================================================================
-   DARK THEME — "Carbon Studio"
+/* DARK THEME – "Carbon Studio"
    Philosophy: neutral dark greys with zero blue saturation. No eye strain.
-   Accent is a calm steel-grey. Status colors remain distinct and meaningful.
-   ========================================================================== */
+   Accent is a calm steel-grey. Status colors remain distinct and meaningful. */
 :root {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
@@ -17,10 +15,10 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* ── Backgrounds — pure neutral greys, no blue tint ── */
-  --bg-app:          #1a1b1e;   /* outermost — near-black neutral */
+  /* Backgrounds – pure neutral greys, no blue tint */
+  --bg-app:          #1a1b1e;   /* outermost – near-black neutral */
   --bg-sidebar:      #202126;   /* sidebar */
-  --bg-surface:      #262830;   /* panels, drawers — slight depth */
+  --bg-surface:      #262830;   /* panels, drawers – slight depth */
   --bg-card:         #2e3038;   /* cards */
   --bg-column:       #22242b;   /* kanban column */
   --bg-modal:        #262830;   /* modal dialogs */
@@ -29,25 +27,25 @@
   --bg-sidebar-footer: rgba(0,0,0, 0.25);
   --border-default:  rgba(255,255,255, 0.13);
 
-  /* ── Borders ── */
+  /* Borders */
   --border-subtle:   rgba(255,255,255, 0.10);
   --border-column:   rgba(255,255,255, 0.11);
   --border-focus:    rgba(140, 160, 185, 0.55);
 
-  /* ── Text ── */
+  /* Text */
   --text-primary:   #d0d3db;   /* light grey-white */
   --text-secondary: #8a8f9e;   /* mid-tone grey */
   --text-muted:     #585e70;   /* subdued, still readable */
 
-  /* ── Accent — neutral steel grey, no harsh blue ── */
+  /* Accent – neutral steel grey, no harsh blue */
   --color-accent:        #8899aa;
   --color-accent-hover:  #9aaabb;
   --color-accent-glow:   rgba(136, 153, 170, 0.13);
 
-  /* ── Kanban status colors — distinct, purposeful ── */
+  /* Kanban status colors – distinct, purposeful */
   --color-todo:     #6b8fb5;   /* slate blue */
   --color-progress: #c49040;   /* amber-gold */
-  --color-review:   #d07040;   /* warm orange — clearly different from todo */
+  --color-review:   #d07040;   /* warm orange – clearly different from todo */
   --color-done:     #3daa74;   /* teal-green, brighter */
   --color-closed:   #505666;   /* grey */
 
@@ -71,13 +69,11 @@
   --card-hover-bg:    #353840;
 }
 
-/* ==========================================================================
-   LIGHT THEME — "Warm Paper"
-   ========================================================================== */
+/* LIGHT THEME – "Warm Paper" */
 body.light-theme {
   color-scheme: light;
 
-  /* ── Backgrounds ── */
+  /* Backgrounds */
   --bg-app:          #ebe8e0;
   --bg-sidebar:      #e2ddd6;
   --bg-surface:      #f0ede6;
@@ -89,29 +85,29 @@ body.light-theme {
   --bg-sidebar-footer: rgba(0,0,0, 0.09);
   --border-default:  rgba(0,0,0, 0.20);
 
-  /* ── Borders ── */
+  /* Borders */
   --border-subtle:   #ccc8be;
   --border-column:   #c4c0b6;
   --border-focus:    rgba(74, 111, 165, 0.55);
 
-  /* ── Text ── */
+  /* Text */
   --text-primary:   #2a2520;
   --text-secondary: #6a6055;
   --text-muted:     #9a9088;
 
-  /* ── Accent ── */
+  /* Accent */
   --color-accent:        #4a6fa5;
   --color-accent-hover:  #5a82ba;
   --color-accent-glow:   rgba(74, 111, 165, 0.10);
 
-  /* ── Kanban status ── */
+  /* Kanban status */
   --color-todo:     #3d74b0;
   --color-progress: #b5720a;
   --color-review:   #c05c1a;   /* warm orange for review */
   --color-done:     #1e8a5e;
   --color-closed:   #7a7068;
 
-  /* ── Shadows ── */
+  /* Shadows */
   --shadow-card:       0 1px 4px rgba(0,0,0, 0.08), 0 1px 2px rgba(0,0,0, 0.05);
   --shadow-card-hover: 0 4px 14px rgba(0,0,0, 0.14), 0 2px 4px rgba(0,0,0, 0.08);
   --shadow-premium:    0 10px 30px rgba(0,0,0, 0.12);

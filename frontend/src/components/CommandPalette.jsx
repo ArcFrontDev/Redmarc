@@ -95,7 +95,7 @@ export default function CommandPalette({
       label="Command Menu"
       className="cmdk-dialog"
       filter={(value, search) => {
-        // Custom filter disabled — we handle filtering ourselves
+        // Custom filter disabled – we handle filtering ourselves
         return 1;
       }}
     >
@@ -114,7 +114,7 @@ export default function CommandPalette({
         <Command.List className="cmdk-list">
           <Command.Empty className="cmdk-empty">No results found.</Command.Empty>
 
-          {/* Empty state — show actions + recent issues */}
+          {/* Empty state – show actions + recent issues */}
           {isEmpty && (
             <>
               <Command.Group heading="Actions">

@@ -27,9 +27,9 @@ const HOTKEYS = [
   {
     section: 'Quick Actions (on focused card)',
     items: [
-      { keys: ['A'], description: 'Quick assign — open detail & focus assignee' },
-      { keys: ['S'], description: 'Quick status — open detail & focus status' },
-      { keys: ['E'], description: 'Edit title — open detail in title edit mode' },
+      { keys: ['A'], description: 'Quick assign – open detail & focus assignee' },
+      { keys: ['S'], description: 'Quick status – open detail & focus status' },
+      { keys: ['E'], description: 'Edit title – open detail in title edit mode' },
     ],
   },
   {
@@ -82,7 +82,11 @@ export function HotkeysModal({ onClose }) {
                     {item.keys.map((k, i) => (
                       <React.Fragment key={k}>
                         <kbd className="hotkey-kbd">{k}</kbd>
-                        {i < item.keys.length - 1 && <span className="hotkey-plus">/</span>}
+                        {i < item.keys.length - 1 && (
+                          <span className="hotkey-plus">
+                            {item.keys.includes('Ctrl') ? '+' : ' / '}
+                          </span>
+                        )}
                       </React.Fragment>
                     ))}
                   </span>

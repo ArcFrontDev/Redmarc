@@ -1,5 +1,5 @@
 // src/utils/api.js
-const API_BASE = ''; // Same origin — Redmine plugin runs at /redmarc on the same host
+const API_BASE = ''; // Same origin – Redmine plugin runs at /redmarc on the same host
 
 async function request(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
@@ -84,7 +84,7 @@ export const api = {
 
   /**
    * Fetch all users. Requires Redmine admin rights.
-   * For non-admin users this will throw — callers should catch gracefully.
+   * For non-admin users this will throw – callers should catch gracefully.
    */
   getUsers: () => request('/users.json'),
 
@@ -107,7 +107,7 @@ export const api = {
 
   /**
    * Add current user as a watcher on an issue.
-   * Requires the user's own ID — pass currentUserId.
+   * Requires the user's own ID – pass currentUserId.
    */
   watchIssue: (issueId, userId) =>
     request(`/issues/${issueId}/watchers.json`, {

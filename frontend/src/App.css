@@ -598,7 +598,7 @@ body.light-theme .column-add-btn {
 }
 
 /* ==========================================================================
-   Issue Cards — flat, no blur, shadow only on hover
+   Issue Cards – flat, no blur, shadow only on hover
    ========================================================================== */
 .issue-card {
   background: var(--bg-card);
@@ -629,7 +629,7 @@ body.light-theme .issue-card:hover {
   box-shadow: var(--shadow-card-hover);
 }
 
-/* Done column — greyed out + strikethrough */
+/* Done column – greyed out + strikethrough */
 .issue-card.is-done {
   opacity: 0.55;
   filter: grayscale(0.4) brightness(0.85);
@@ -657,7 +657,7 @@ body.light-theme .issue-card.is-focused-card {
   box-shadow: 0 0 0 3px var(--color-accent-glow);
 }
 
-/* Priority strip — 4px left bar, colored inline by JS */
+/* Priority strip – 4px left bar, colored inline by JS */
 .card-priority-strip {
   width: 4px;
   min-height: 100%;
@@ -1477,7 +1477,7 @@ body.light-theme .textile-body .textile-code {
 }
 
 /* ==========================================================================
-   IssueCard — Color markers (priority + status)
+   IssueCard – Color markers (priority + status)
    ========================================================================== */
 .card-priority-strip {
   width: 4px;
@@ -1534,7 +1534,7 @@ body.light-theme .textile-body .textile-code {
 }
 
 /* ==========================================================================
-   IssueCard — Assignee avatar hue
+   IssueCard – Assignee avatar hue
    ========================================================================== */
 .card-assignee-avatar {
   width: 20px;
@@ -1777,9 +1777,7 @@ body.light-theme .textile-body .textile-code {
   flex-shrink: 0;
 }
 
-/* ==========================================================================
-   Sidebar footer — hotkeys trigger button
-   ========================================================================== */
+/* Sidebar footer – hotkeys trigger button */
 .sidebar-footer-row {
   display: flex;
   align-items: center;
@@ -1817,5 +1815,55 @@ body.light-theme .textile-body .textile-code {
   border-radius: 8px;
   outline: 1px dashed var(--color-accent);
   outline-offset: -2px;
+}
+
+/* ==========================================================================
+   Custom Date Picker
+   ========================================================================== */
+.custom-date-picker-container {
+  position: relative;
+  width: 100%;
+}
+
+.custom-date-picker-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.custom-date-display-input {
+  padding-right: 48px; /* space for clear button and calendar icon */
+  cursor: pointer;
+}
+
+.custom-date-clear-btn {
+  position: absolute;
+  right: 28px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: var(--transition-smooth);
+}
+
+.custom-date-clear-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.custom-date-calendar-icon {
+  position: absolute;
+  right: 10px;
+  font-size: 14px;
+  pointer-events: none;
+  opacity: 0.65;
+  display: flex;
+  align-items: center;
 }
 

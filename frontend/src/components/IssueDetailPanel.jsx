@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { formatStatusName, getColumnForStatus } from '../utils/statusMapping';
 import { api } from '../utils/api';
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
+// Icons
 const XIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
     <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -37,7 +37,7 @@ const EyeOffIcon = () => (
   </svg>
 );
 
-// ─── Textile → HTML renderer ─────────────────────────────────────────────────
+// Textile HTML renderer
 function textileToHtml(text) {
   if (!text) return '';
 
@@ -65,7 +65,7 @@ function textileToHtml(text) {
   return html;
 }
 
-// ─── Smart Journal Detail Formatter ──────────────────────────────────────────
+// Smart Journal Detail Formatter
 const FIELD_NAME_MAP = {
   status_id:        'Status',
   assigned_to_id:   'Assignee',
@@ -116,7 +116,7 @@ function formatJournalDetail(detail, statuses = [], users = []) {
   return `${fieldLabel}: ${oldLabel} → ${newLabel}`;
 }
 
-// ─── Attachment helpers ───────────────────────────────────────────────────────
+// Attachment helpers
 const IMAGE_EXTS = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp'];
 function isImage(filename) {
   const ext = (filename || '').split('.').pop().toLowerCase();
@@ -130,7 +130,67 @@ function formatBytes(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// Custom Date Picker component
+function SidebarDatePicker({ value, onChange }) {
+  const nativeInputRef = useRef(null);
+
+  const handleWrapperClick = (e) => {
+    if (e.target.closest('.custom-date-clear-btn')) return;
+    try {
+      if (nativeInputRef.current) {
+        nativeInputRef.current.showPicker();
+      }
+    } catch (err) {
+      console.warn('showPicker failed, fallback to focus:', err);
+      nativeInputRef.current?.focus();
+    }
+  };
+
+  const handleClear = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onChange(null);
+  };
+
+  return (
+    <div className="custom-date-picker-container" onClick={handleWrapperClick}>
+      <div className="custom-date-picker-wrapper">
+        <input
+          type="text"
+          className="details-input custom-date-display-input"
+          value={value || ''}
+          placeholder="YYYY-MM-DD"
+          readOnly
+        />
+        {value && (
+          <button type="button" className="custom-date-clear-btn" onClick={handleClear} title="Clear date">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        )}
+        <span className="custom-date-calendar-icon">📅</span>
+      </div>
+      <input
+        ref={nativeInputRef}
+        type="date"
+        value={value || ''}
+        onChange={e => onChange(e.target.value || null)}
+        style={{
+          position: 'absolute',
+          opacity: 0,
+          width: 0,
+          height: 0,
+          pointerEvents: 'none',
+          zIndex: -1
+        }}
+      />
+    </div>
+  );
+}
+
+// Component
 const PRIORITIES = [
   { id: 1, label: 'Low' },
   { id: 2, label: 'Normal' },
@@ -168,7 +228,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
 
   const titleRef = useRef(null);
 
-  // ── Load current user once ───────────────────────────────────────────────
+  // Load current user once
   useEffect(() => {
     api.getCurrentUser().then(res => {
       if (res?.user?.id) setCurrentUserId(res.user.id);
@@ -183,7 +243,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
     return () => window.removeEventListener('keydown', handler);
   }, [isOpen, onClose]);
 
-  // ── Fetch full issue on open ─────────────────────────────────────────────
+  // Fetch full issue on open
   useEffect(() => {
     if (!isOpen || !issue) {
       setFullIssue(null);
@@ -238,7 +298,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
     if (isEditingTitle && titleRef.current) titleRef.current.focus();
   }, [isEditingTitle]);
 
-  // ── Handle initialFocus (from keyboard shortcut) ─────────────────────────
+  // Handle initialFocus from keyboard shortcut
   useEffect(() => {
     if (!initialFocus || !isOpen) return;
     if (initialFocus === 'title') {
@@ -246,7 +306,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
     }
   }, [initialFocus, isOpen]);
 
-  // ── Inline edit handlers ─────────────────────────────────────────────────
+  // Inline edit handlers
   const handleSaveTitle = async () => {
     const trimmed = titleVal.trim();
     if (!trimmed || trimmed === fullIssue?.subject) {
@@ -294,7 +354,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
     }
   }, [issue, onIssueUpdated]);
 
-  // ── Comment ──────────────────────────────────────────────────────────────
+  // Comment
   const handleAddComment = async () => {
     const notes = commentText.trim();
     if (!notes) return;
@@ -312,7 +372,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
     }
   };
 
-  // ── Watch/Unwatch ────────────────────────────────────────────────────────
+  // Watch/Unwatch
   const handleToggleWatch = async () => {
     if (!currentUserId || watchLoading) return;
     setWatchLoading(true);
@@ -331,7 +391,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
     }
   };
 
-  // ── Copy link ────────────────────────────────────────────────────────────
+  // Copy link
   const handleCopyLink = () => {
     const url = `${window.location.origin}/issues/${issue.id}`;
     navigator.clipboard.writeText(url).then(() => {
@@ -553,7 +613,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                 </div>
               </div>
 
-              {/* ── Right sidebar — fields ── */}
+              {/* Right sidebar – fields */}
               <div className="drawer-sidebar">
 
                 {/* Status */}
@@ -645,24 +705,18 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                 {/* Start Date */}
                 <div className="control-group">
                   <label className="sidebar-label">Start Date</label>
-                  <input
-                    type="date"
-                    lang="en"
-                    className="details-input"
+                  <SidebarDatePicker
                     value={fullIssue?.start_date || displayIssue.start_date || ''}
-                    onChange={e => handleFieldUpdate('start_date', e.target.value || null)}
+                    onChange={val => handleFieldUpdate('start_date', val)}
                   />
                 </div>
 
                 {/* Due Date */}
                 <div className="control-group">
                   <label className="sidebar-label">Due Date</label>
-                  <input
-                    type="date"
-                    lang="en"
-                    className="details-input"
+                  <SidebarDatePicker
                     value={fullIssue?.due_date || displayIssue.due_date || ''}
-                    onChange={e => handleFieldUpdate('due_date', e.target.value || null)}
+                    onChange={val => handleFieldUpdate('due_date', val)}
                   />
                 </div>
 

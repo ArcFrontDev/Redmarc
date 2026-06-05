@@ -27,7 +27,7 @@ export function useDragAndDrop({ groupedIssues, statuses, handleUpdateStatus }) 
     if (!activeCol || !targetCol || typeof targetCol !== 'string') return;
 
     if (activeCol !== targetCol) {
-      // ── Cross-column: status update with optimistic rollback ──────────────
+      // Cross-column: status update with optimistic rollback
       const issueId = active.id;
       const allIssues = Object.values(groupedIssues).flat();
       const issue = allIssues.find(i => i.id === issueId);
@@ -39,7 +39,7 @@ export function useDragAndDrop({ groupedIssues, statuses, handleUpdateStatus }) 
       const targetStatus = statuses.find(s => getColumnForStatus(s.name) === targetCol);
       if (!targetStatus) return;
 
-      // Optimistic update — fires immediately in UI
+      // Optimistic update – fires immediately in UI
       // handleUpdateStatus already sets optimistic state in parent
       const originalStatusId = issue.status?.id;
       const originalStatusName = issue.status?.name;
@@ -54,13 +54,13 @@ export function useDragAndDrop({ groupedIssues, statuses, handleUpdateStatus }) 
       // Call with rollback
       handleUpdateStatus(issueId, targetStatus.id, (apiError) => {
         if (apiError && pendingRollback.current?.issueId === issueId) {
-          // Rollback — restore original status
+          // Rollback – restore original status
           handleUpdateStatus(issueId, originalStatusId);
           pendingRollback.current = null;
         }
       });
     } else {
-      // ── Same-column reorder (localStorage only) ───────────────────────────
+      // Same-column reorder (localStorage only)
       if (active.id === over.id) return;
 
       const colIssues = groupedIssues[activeCol] || [];

@@ -47,7 +47,7 @@ export function useAppData() {
         const usersData = await api.getUsers();
         setUsers(usersData.users || []);
       } catch {
-        // Non-admin users cannot list all users — expected
+        // Non-admin users cannot list all users – expected
         setUsers([]);
       }
     } catch (err) {
