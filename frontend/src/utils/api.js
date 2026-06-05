@@ -61,7 +61,7 @@ export const api = {
   /**
    * Fetch full issue details including journals and attachments.
    */
-  getIssueDetails: (id) => request(`/issues/${id}.json?include=journals,attachments`),
+  getIssueDetails: (id) => request(`/issues/${id}.json?include=journals,attachments,watchers`),
 
   /**
    * Add a comment (note) to an issue.
@@ -92,6 +92,34 @@ export const api = {
    * Fetch current user info without admin rights.
    */
   getCurrentUser: () => request('/users/current.json'),
+
+  /**
+   * Fetch issue categories for a project.
+   */
+  getProjectCategories: (projectId) =>
+    request(`/projects/${projectId}/issue_categories.json`),
+
+  /**
+   * Fetch versions (milestones) for a project.
+   */
+  getProjectVersions: (projectId) =>
+    request(`/projects/${projectId}/versions.json`),
+
+  /**
+   * Add current user as a watcher on an issue.
+   * Requires the user's own ID — pass currentUserId.
+   */
+  watchIssue: (issueId, userId) =>
+    request(`/issues/${issueId}/watchers.json`, {
+      method: 'POST',
+      body: JSON.stringify({ user_id: userId }),
+    }),
+
+  /**
+   * Remove current user from watchers.
+   */
+  unwatchIssue: (issueId, userId) =>
+    request(`/issues/${issueId}/watchers/${userId}.json`, { method: 'DELETE' }),
 
   /**
    * Upload a file attachment. Returns { token } on success.
