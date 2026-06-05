@@ -1,5 +1,5 @@
 // hooks/useDragAndDrop.js
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import { getColumnForStatus } from '../utils/statusMapping';
 
@@ -8,6 +8,9 @@ export function useDragAndDrop({ groupedIssues, statuses, handleUpdateStatus }) 
     try { return JSON.parse(localStorage.getItem('redmarc-sort-order')) || {}; }
     catch { return {}; }
   });
+
+  // Track pending status updates for rollback on API failure
+  const pendingRollback = useRef(null);
 
   const handleUpdateSortOrder = useCallback((newOrder) => {
     setSortOrder(newOrder);
@@ -18,35 +21,46 @@ export function useDragAndDrop({ groupedIssues, statuses, handleUpdateStatus }) 
     const { active, over } = event;
     if (!over) return;
 
-    // activeCol and targetCol are ALWAYS column key strings ('todo', 'progress', 'review', 'done')
-    // IssueCard sets data.col = getColumnForStatus(issue.status?.name)
     const activeCol = active.data.current?.col;
-
-    // over.data.current?.col exists when dropped on a sortable item
-    // fall back to over.id which is the droppable column id
     const targetCol = over.data.current?.col || over.id;
 
     if (!activeCol || !targetCol || typeof targetCol !== 'string') return;
 
     if (activeCol !== targetCol) {
-      // Cross-column drag: update status
-      // Smart pick: prefer the first status that maps to targetCol
-      // but if the issue already has a status mapping to targetCol (edge case), keep it
+      // ── Cross-column: status update with optimistic rollback ──────────────
       const issueId = active.id;
-      const issue = Object.values(groupedIssues).flat().find(i => i.id === issueId);
+      const allIssues = Object.values(groupedIssues).flat();
+      const issue = allIssues.find(i => i.id === issueId);
       if (!issue) return;
 
-      // Check if the issue's current status already maps to targetCol (shouldn't happen in cross-col, but safe guard)
       const currentStatusCol = getColumnForStatus(issue.status?.name);
       if (currentStatusCol === targetCol) return;
 
-      // Pick the first status that maps to the target column
       const targetStatus = statuses.find(s => getColumnForStatus(s.name) === targetCol);
-      if (targetStatus) {
-        handleUpdateStatus(issueId, targetStatus.id);
-      }
+      if (!targetStatus) return;
+
+      // Optimistic update — fires immediately in UI
+      // handleUpdateStatus already sets optimistic state in parent
+      const originalStatusId = issue.status?.id;
+      const originalStatusName = issue.status?.name;
+
+      // Store rollback data
+      pendingRollback.current = {
+        issueId,
+        originalStatusId,
+        originalStatusName,
+      };
+
+      // Call with rollback
+      handleUpdateStatus(issueId, targetStatus.id, (apiError) => {
+        if (apiError && pendingRollback.current?.issueId === issueId) {
+          // Rollback — restore original status
+          handleUpdateStatus(issueId, originalStatusId);
+          pendingRollback.current = null;
+        }
+      });
     } else {
-      // Same-column reorder
+      // ── Same-column reorder (localStorage only) ───────────────────────────
       if (active.id === over.id) return;
 
       const colIssues = groupedIssues[activeCol] || [];

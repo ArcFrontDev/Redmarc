@@ -5,6 +5,7 @@ import {
   closestCorners,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
@@ -26,7 +27,13 @@ export function KanbanBoard({ groupedIssues, onIssueClick, onAddIssue, onDragEnd
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // Requires 5px movement before drag starts (helps click vs drag)
+        distance: 8, // px before drag starts — prevents accidental drags on click
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,      // ms hold before drag starts on touch
+        tolerance: 6,    // px movement tolerance during hold
       },
     }),
     useSensor(KeyboardSensor, {
@@ -69,6 +76,7 @@ export function KanbanBoard({ groupedIssues, onIssueClick, onAddIssue, onDragEnd
             issues={groupedIssues[col.id] || []}
             onIssueClick={onIssueClick}
             onAddIssue={() => onAddIssue(col.id)}
+            activeId={activeId}
           />
         ))}
       </div>
