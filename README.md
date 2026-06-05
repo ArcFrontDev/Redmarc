@@ -2,50 +2,50 @@
   <img src="docs/images/Baner.png" alt="ArcFront Redmarc Banner" width="100%" />
 </div>
 
-**Redmarc** is a fast, keyboard-first Single Page Application frontend for [Redmine](https://www.redmine.org/). It replaces Redmine's default interface with a modern, responsive workspace — without touching your data or backend.
+**Redmarc** is a fast, keyboard-first Single Page Application frontend for [Redmine](https://www.redmine.org/). It replaces Redmine's default interface with a modern, responsive workspace – without touching your data or backend.
 
-> Built by [ArcFront](https://github.com/ArcFrontDev) — we give software the face it deserves.
+> Built by [ArcFront](https://github.com/ArcFrontDev) – we give software the face it deserves.
 
 ---
 
 ## Screenshots
 
-**Kanban Board — Dark (Slate Studio)**
-<img src="docs/images/Kanban_Dark_v0_2.png" alt="Kanban Board Dark Mode v0.2" width="100%" />
+**Kanban Board – Dark**
+<img src="docs/images/Kanban_Dark_v0_2_1.png" alt="Kanban Board Dark" width="100%" />
 
-**Kanban Board — Light (Warm Paper)**
-<img src="docs/images/Kanban_White_v0_2.png" alt="Kanban Board Light Mode v0.2" width="100%" />
+**Kanban Board – Light**
+<img src="docs/images/Kanban_White_v0_2_1.png" alt="Kanban Board Light" width="100%" />
 
 ---
 
 ## What's New in v0.2
 
-- **Drag & Drop** — Move issues between columns. Status is updated in Redmine automatically.
-- **Real Pagination** — Fetches all issues recursively, no 100-issue hard limit.
-- **Issue Detail Panel** — Edit priority, due date, estimated hours, and post comments directly from the panel.
-- **Activity Journal** — Human-readable change history (names instead of raw IDs).
-- **Textile Rendering** — Issue descriptions and comments render bold, italic, code blocks, links, and lists.
-- **Redesigned Themes** — "Slate Studio" dark and "Warm Paper" light. No neon, no blur, every surface has its own distinct tone.
-- **Refactored Architecture** — DnD logic extracted to a dedicated hook. App.jsx is now a clean orchestrator.
+- **Drag & Drop** – Move issues between columns. Status is updated in Redmine automatically.
+- **Real Pagination** – Fetches all issues recursively, no 100-issue hard limit.
+- **Issue Detail Panel** – Edit priority, due date, estimated hours, and post comments directly from the panel.
+- **Activity Journal** – Human-readable change history (names instead of raw IDs).
+- **Textile Rendering** – Issue descriptions and comments render bold, italic, code blocks, links, and lists.
+- **Redesigned Themes** – "Slate Studio" dark and "Warm Paper" light. No neon, no blur, every surface has its own distinct tone.
+- **Refactored Architecture** – DnD logic extracted to a dedicated hook. App.jsx is now a clean orchestrator.
 
 ---
 
 ## Features
 
-- **Keyboard First** — Full keyboard navigation. `Ctrl+K` opens the command palette.
-- **Kanban Board** — Drag and drop issues across status columns with live Redmine sync.
-- **List View** — Dense, sortable table view for power users.
-- **Issue Detail** — Side panel with inline editing, comment posting, priority and due date controls.
-- **Command Palette** — Search issues, switch projects, trigger actions — all without touching the mouse.
-- **Dark & Light Themes** — Two carefully crafted palettes. Toggle with a single click.
-- **Native Integration** — Installed as a Redmine plugin. Uses your existing session — no API keys needed.
-- **Zero Config** — Works out of the box with your existing Redmine projects, issues, and users.
+- **Keyboard First** – Full keyboard navigation. `Ctrl+K` opens the command palette.
+- **Kanban Board** – Drag and drop issues across status columns with live Redmine sync.
+- **List View** – Dense, sortable table view for power users.
+- **Issue Detail** – Side panel with inline editing, comment posting, priority and due date controls.
+- **Command Palette** – Search issues, switch projects, trigger actions – all without touching the mouse.
+- **Dark & Light Themes** – Two carefully crafted palettes. Toggle with a single click.
+- **Native Integration** – Installed as a Redmine plugin. Uses your existing session – no API keys needed.
+- **Zero Config** – Works out of the box with your existing Redmine projects, issues, and users.
 
 ---
 
 ## Architecture
 
-Redmarc is a Redmine plugin that intercepts the `/redmarc` route and serves a compiled React (Vite) SPA. Because it runs on the same domain as your Redmine instance, it inherits the session cookie for authentication — no OAuth or token setup required.
+Redmarc is a Redmine plugin that intercepts the `/redmarc` route and serves a compiled React (Vite) SPA. Because it runs on the same domain as your Redmine instance, it inherits the session cookie for authentication – no OAuth or token setup required.
 
 ```
 Browser → /redmarc → Rails plugin → React SPA
@@ -54,7 +54,7 @@ Browser → /redmarc → Rails plugin → React SPA
                    /projects.json
 ```
 
-The frontend communicates exclusively through Redmine's public JSON API. The backend plugin is minimal — a single controller, a single route, and an asset manifest.
+The frontend communicates exclusively through Redmine's public JSON API. The backend plugin is minimal – a single controller, a single route, and an asset manifest.
 
 ---
 
@@ -113,7 +113,7 @@ npm run dev
 # → http://localhost:5173/plugin_assets/arcfront/
 ```
 
-The dev server proxies asset requests. Make sure your Redmine instance is running and you are logged in before opening the dev URL — Redmarc reads the session from the same origin.
+The dev server proxies asset requests. Make sure your Redmine instance is running and you are logged in before opening the dev URL – Redmarc reads the session from the same origin.
 
 ---
 
@@ -134,4 +134,4 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before
 
 ## License
 
-MIT — see [LICENSE](LICENSE) for details.
+MIT – see [LICENSE](LICENSE) for details.

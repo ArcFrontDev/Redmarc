@@ -1,6 +1,6 @@
 # Contributing to Redmarc
 
-Thank you for your interest in contributing to Redmarc. Every improvement matters — whether it is a bug report, a design suggestion, or a pull request.
+Thank you for your interest in contributing to Redmarc. Every improvement matters – whether it is a bug report, a design suggestion, or a pull request.
 
 ---
 
@@ -23,13 +23,13 @@ Be respectful. We maintain a welcoming environment for contributors of all backg
 ### Suggesting Features
 
 - Open an issue with the `enhancement` label.
-- Describe the use case — why would this be useful to other Redmine users?
+- Describe the use case – why would this be useful to other Redmine users?
 - If you have a design idea, sketches or mockups are very welcome.
 
 ### Pull Requests
 
 - Fork the repository and create a feature branch: `git checkout -b feat/your-feature`
-- Keep pull requests focused — one feature or fix per PR.
+- Keep pull requests focused – one feature or fix per PR.
 - Include screenshots in the PR description if you changed the UI.
 - Make sure the frontend builds without errors: `npm run build`
 - End all files with a newline.
@@ -43,9 +43,9 @@ Be respectful. We maintain a welcoming environment for contributors of all backg
 The backend is minimal. The main files are:
 
 ```
-app/controllers/redmarc_controller.rb  — single controller, renders the SPA
-config/routes.rb                       — registers /redmarc route
-init.rb                                — plugin registration
+app/controllers/redmarc_controller.rb  – single controller, renders the SPA
+config/routes.rb                       – registers /redmarc route
+init.rb                                – plugin registration
 ```
 
 ### Frontend (React + Vite)
