@@ -3,14 +3,38 @@ import { getPriorityConfig, getColumnForStatus } from '../utils/statusMapping';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+// Priority color map
+const PRIORITY_COLORS = {
+  1: '#6b7280', // Low     — grey
+  2: '#3b82f6', // Normal  — blue
+  3: '#f59e0b', // High    — amber
+  4: '#ef4444', // Urgent  — red
+  5: '#dc2626', // Immediate — deep red
+};
+
+// Status column dot colors
+const STATUS_DOT_COLORS = {
+  todo:     '#6b7280', // grey
+  progress: '#f59e0b', // amber
+  review:   '#a78bfa', // purple
+  done:     '#22c55e', // green
+};
+
+const PRIORITY_LABELS = {
+  1: 'Low', 2: 'Normal', 3: 'High', 4: 'Urgent', 5: 'Immediate',
+};
+
 export function IssueCard({ issue, onClick, isOverlay }) {
   const priority = getPriorityConfig(issue.priority?.id || 2);
+  const priorityId = issue.priority?.id || 2;
+  const priorityColor = PRIORITY_COLORS[priorityId] || PRIORITY_COLORS[2];
+  const priorityLabel = PRIORITY_LABELS[priorityId] || 'Normal';
+
   const assigneeName = issue.assigned_to?.name || null;
   const assigneeInitial = assigneeName ? assigneeName.charAt(0).toUpperCase() : null;
 
-  // FIX: col must be a column key string ('todo', 'progress', 'review', 'done')
-  // NOT status.id (a number)
   const colKey = getColumnForStatus(issue.status?.name);
+  const statusDotColor = STATUS_DOT_COLORS[colKey] || STATUS_DOT_COLORS.todo;
 
   const {
     attributes,
@@ -27,39 +51,63 @@ export function IssueCard({ issue, onClick, isOverlay }) {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.4 : 1,
+    opacity: isDragging ? 0.3 : 1,
   };
 
   const overlayStyle = isOverlay ? {
-    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
-    transform: 'rotate(1.5deg) scale(1.02)',
+    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.28)',
+    transform: 'rotate(1.5deg) scale(1.03)',
     cursor: 'grabbing',
     zIndex: 9999,
   } : {};
-
-  const isFinished = ['done', 'review'].includes(colKey) &&
-    (issue.status?.name?.toLowerCase().includes('clos') ||
-     issue.status?.name?.toLowerCase().includes('reject') ||
-     issue.status?.name?.toLowerCase() === 'закрыта');
 
   return (
     <div
       ref={setNodeRef}
       style={{ ...style, ...overlayStyle }}
-      className={`issue-card ${isFinished ? 'finished-task' : ''} ${isOverlay ? 'is-overlay' : ''}`}
+      className={`issue-card ${isOverlay ? 'is-overlay' : ''} ${isDragging ? 'is-dragging' : ''}`}
       onClick={onClick}
       {...attributes}
       {...listeners}
     >
-      {/* Priority strip — left color bar */}
-      <div className={`card-priority-strip ${priority.cssClass}`} />
+      {/* Left priority strip */}
+      <div
+        className="card-priority-strip"
+        style={{ backgroundColor: priorityColor }}
+        title={`Priority: ${priorityLabel}`}
+      />
 
       <div className="card-body">
-        {/* Project tag */}
-        <div className="card-project-tag">{issue.project.name}</div>
+        {/* Top row: project tag + status dot */}
+        <div className="card-top-row">
+          <div className="card-project-tag">{issue.project.name}</div>
+          <div className="card-status-indicators">
+            {/* Status dot */}
+            <span
+              className="card-status-dot"
+              style={{ backgroundColor: statusDotColor }}
+              title={issue.status?.name || 'Unknown'}
+            />
+            {/* Priority badge */}
+            <span
+              className="card-priority-badge"
+              style={{ color: priorityColor, borderColor: `${priorityColor}44` }}
+              title={`Priority: ${priorityLabel}`}
+            >
+              {priorityLabel}
+            </span>
+          </div>
+        </div>
 
         {/* Title */}
         <div className="card-title">{issue.subject}</div>
+
+        {/* Due date warning if overdue */}
+        {issue.due_date && new Date(issue.due_date) < new Date() && colKey !== 'done' && (
+          <div className="card-due-overdue" title={`Due: ${issue.due_date}`}>
+            ⚠ {issue.due_date}
+          </div>
+        )}
 
         {/* Footer: ID + assignee */}
         <div className="card-footer">
@@ -67,7 +115,12 @@ export function IssueCard({ issue, onClick, isOverlay }) {
           <div className="card-assignee">
             {assigneeInitial ? (
               <>
-                <span className="card-assignee-avatar">{assigneeInitial}</span>
+                <span
+                  className="card-assignee-avatar"
+                  style={{ backgroundColor: `hsl(${(assigneeName.charCodeAt(0) * 37) % 360}, 50%, 45%)` }}
+                >
+                  {assigneeInitial}
+                </span>
                 <span className="card-assignee-name">{assigneeName}</span>
               </>
             ) : (

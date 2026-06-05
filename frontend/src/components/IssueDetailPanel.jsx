@@ -16,8 +16,28 @@ const ExternalIcon = () => (
   </svg>
 );
 
+const CopyIcon = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+  </svg>
+);
+
+const EyeIcon = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const EyeOffIcon = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+    <line x1="1" y1="1" x2="23" y2="23" />
+  </svg>
+);
+
 // ─── Textile → HTML renderer ─────────────────────────────────────────────────
-// Covers the most common Redmine Textile markup without a heavy library.
 function textileToHtml(text) {
   if (!text) return '';
 
@@ -26,39 +46,20 @@ function textileToHtml(text) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  // Headings: h1. h2. h3.
   html = html.replace(/^h([1-6])\. (.+)$/gm, (_, level, content) =>
     `<h${level} class="textile-h">${content}</h${level}>`);
-
-  // Bold: **text** or *text*
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   html = html.replace(/\*([^*\n]+?)\*/g, '<strong>$1</strong>');
-
-  // Italic: __text__ or _text_
   html = html.replace(/__(.+?)__/g, '<em>$1</em>');
   html = html.replace(/_([^_\n]+?)_/g, '<em>$1</em>');
-
-  // Monospace/code: @text@
   html = html.replace(/@([^@\n]+?)@/g, '<code class="textile-code">$1</code>');
-
-  // Strikethrough: -text-
-  html = html.replace(/(?<![\\w])-([^-\n]+)-(?![\\w])/g, '<del>$1</del>');
-
-  // Unordered list
+  html = html.replace(/(?<![\w])-([^-\n]+)-(?![\w])/g, '<del>$1</del>');
   html = html.replace(/^\* (.+)$/gm, '<li class="textile-li">$1</li>');
-
-  // Blockquote: > text
   html = html.replace(/^&gt; (.+)$/gm, '<blockquote class="textile-quote">$1</blockquote>');
-
-  // Links: "text":url
   html = html.replace(/"([^"]+)":((https?|ftp):\/\/[^\s]+)/g,
     '<a href="$2" target="_blank" rel="noreferrer" class="textile-link">$1</a>');
-
-  // Bare URLs
   html = html.replace(/(?<!href=")((?:https?|ftp):\/\/[^\s<"]+)/g,
     '<a href="$1" target="_blank" rel="noreferrer" class="textile-link">$1</a>');
-
-  // Newlines to <br>
   html = html.replace(/\n/g, '<br/>');
 
   return html;
@@ -70,6 +71,7 @@ const FIELD_NAME_MAP = {
   assigned_to_id:   'Assignee',
   priority_id:      'Priority',
   due_date:         'Due Date',
+  start_date:       'Start Date',
   estimated_hours:  'Estimated Hours',
   done_ratio:       'Progress',
   description:      'Description',
@@ -78,7 +80,7 @@ const FIELD_NAME_MAP = {
   project_id:       'Project',
   fixed_version_id: 'Version',
   category_id:      'Category',
-  start_date:       'Start Date',
+  parent_id:        'Parent Issue',
   is_private:       'Private',
 };
 
@@ -108,7 +110,24 @@ function formatJournalDetail(detail, statuses = [], users = []) {
   const oldLabel = resolve(fieldKey, detail.old_value);
   const newLabel = resolve(fieldKey, detail.new_value);
 
-  return `Changed ${fieldLabel}: ${oldLabel} → ${newLabel}`;
+  if (fieldKey === 'description' || fieldKey === 'subject') {
+    return `Updated ${fieldLabel}`;
+  }
+  return `${fieldLabel}: ${oldLabel} → ${newLabel}`;
+}
+
+// ─── Attachment helpers ───────────────────────────────────────────────────────
+const IMAGE_EXTS = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp'];
+function isImage(filename) {
+  const ext = (filename || '').split('.').pop().toLowerCase();
+  return IMAGE_EXTS.includes(ext);
+}
+
+function formatBytes(bytes) {
+  if (!bytes) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -135,7 +154,26 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
   const [commentText, setCommentText] = useState('');
   const [commentSaving, setCommentSaving] = useState(false);
 
+  // Project-level data (categories + versions)
+  const [categories, setCategories] = useState([]);
+  const [versions, setVersions] = useState([]);
+
+  // Watch state
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [isWatching, setIsWatching] = useState(false);
+  const [watchLoading, setWatchLoading] = useState(false);
+
+  // Copy feedback
+  const [copied, setCopied] = useState(false);
+
   const titleRef = useRef(null);
+
+  // ── Load current user once ───────────────────────────────────────────────
+  useEffect(() => {
+    api.getCurrentUser().then(res => {
+      if (res?.user?.id) setCurrentUserId(res.user.id);
+    }).catch(() => {});
+  }, []);
 
   // Esc to close
   useEffect(() => {
@@ -145,32 +183,62 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
     return () => window.removeEventListener('keydown', handler);
   }, [isOpen, onClose]);
 
-  // Fetch full issue on open
+  // ── Fetch full issue on open ─────────────────────────────────────────────
   useEffect(() => {
     if (!isOpen || !issue) {
       setFullIssue(null);
       setCommentText('');
+      setCategories([]);
+      setVersions([]);
       return;
     }
     let active = true;
     setLoading(true);
+
     api.getIssueDetails(issue.id)
       .then(res => {
-        if (active) {
-          setFullIssue(res.issue);
-          setTitleVal(res.issue.subject || '');
-          setDescVal(res.issue.description || '');
+        if (!active) return;
+        const fi = res.issue;
+        setFullIssue(fi);
+        setTitleVal(fi.subject || '');
+        setDescVal(fi.description || '');
+
+        // Determine watch state
+        if (currentUserId && fi.watchers) {
+          setIsWatching(fi.watchers.some(w => w.id === currentUserId));
+        }
+
+        // Fetch project-level data
+        const pid = fi.project?.id;
+        if (pid) {
+          Promise.allSettled([
+            api.getProjectCategories(pid),
+            api.getProjectVersions(pid),
+          ]).then(([catRes, verRes]) => {
+            if (!active) return;
+            if (catRes.status === 'fulfilled') setCategories(catRes.value?.issue_categories || []);
+            if (verRes.status === 'fulfilled') setVersions(verRes.value?.versions || []);
+          });
         }
       })
       .catch(console.error)
       .finally(() => { if (active) setLoading(false); });
+
     return () => { active = false; };
-  }, [isOpen, issue]);
+  }, [isOpen, issue]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Update watch when currentUserId loads after fullIssue
+  useEffect(() => {
+    if (currentUserId && fullIssue?.watchers) {
+      setIsWatching(fullIssue.watchers.some(w => w.id === currentUserId));
+    }
+  }, [currentUserId, fullIssue]);
 
   useEffect(() => {
     if (isEditingTitle && titleRef.current) titleRef.current.focus();
   }, [isEditingTitle]);
 
+  // ── Inline edit handlers ─────────────────────────────────────────────────
   const handleSaveTitle = async () => {
     const trimmed = titleVal.trim();
     if (!trimmed || trimmed === fullIssue?.subject) {
@@ -218,6 +286,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
     }
   }, [issue, onIssueUpdated]);
 
+  // ── Comment ──────────────────────────────────────────────────────────────
   const handleAddComment = async () => {
     const notes = commentText.trim();
     if (!notes) return;
@@ -235,6 +304,34 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
     }
   };
 
+  // ── Watch/Unwatch ────────────────────────────────────────────────────────
+  const handleToggleWatch = async () => {
+    if (!currentUserId || watchLoading) return;
+    setWatchLoading(true);
+    try {
+      if (isWatching) {
+        await api.unwatchIssue(issue.id, currentUserId);
+        setIsWatching(false);
+      } else {
+        await api.watchIssue(issue.id, currentUserId);
+        setIsWatching(true);
+      }
+    } catch (err) {
+      console.error('Watch toggle failed:', err);
+    } finally {
+      setWatchLoading(false);
+    }
+  };
+
+  // ── Copy link ────────────────────────────────────────────────────────────
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}/issues/${issue.id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    }).catch(() => {});
+  };
+
   const displayIssue = fullIssue || issue;
   const redmineIssueUrl = issue ? `${window.location.origin}/issues/${issue.id}` : '#';
 
@@ -245,16 +342,40 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
       <div className={`issue-detail-drawer ${isOpen ? 'is-open' : ''}`}>
         {displayIssue && (
           <>
-            {/* Header */}
+            {/* ── Header ── */}
             <div className="drawer-header">
               <div className="drawer-header-meta">
                 <span className="details-issue-id">#{displayIssue.id}</span>
                 <span className="details-project-tag">{displayIssue.project?.name}</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="drawer-header-actions">
+                {/* Copy link */}
+                <button
+                  className="btn btn-icon"
+                  onClick={handleCopyLink}
+                  title={copied ? 'Copied!' : 'Copy link to issue'}
+                  style={copied ? { color: 'var(--color-done)' } : {}}
+                >
+                  <CopyIcon />
+                </button>
+
+                {/* Watch/Unwatch */}
+                {currentUserId && (
+                  <button
+                    className={`btn btn-icon ${isWatching ? 'btn-watching' : ''}`}
+                    onClick={handleToggleWatch}
+                    disabled={watchLoading}
+                    title={isWatching ? 'Unwatch issue' : 'Watch issue'}
+                  >
+                    {isWatching ? <EyeOffIcon /> : <EyeIcon />}
+                  </button>
+                )}
+
+                {/* Open in Redmine */}
                 <a href={redmineIssueUrl} target="_blank" rel="noreferrer" className="btn btn-icon" title="Open in Redmine">
                   <ExternalIcon />
                 </a>
+
                 <button className="close-modal-btn" onClick={onClose} title="Close (Esc)">
                   <XIcon />
                 </button>
@@ -262,8 +383,9 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
             </div>
 
             <div className="drawer-body">
-              {/* Main scrollable content */}
+              {/* ── Main scrollable content ── */}
               <div className="drawer-content">
+
                 {/* Title */}
                 {isEditingTitle ? (
                   <input
@@ -318,24 +440,50 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                   )}
                 </div>
 
-                {/* Attachments */}
+                {/* ── Attachments ── */}
                 {displayIssue.attachments && displayIssue.attachments.length > 0 && (
                   <div className="details-attachments">
                     <h4 className="section-heading" style={{ marginTop: '16px' }}>Attachments</h4>
-                    <ul className="attachment-list">
+                    <div className="attachment-grid">
                       {displayIssue.attachments.map(att => (
-                        <li key={att.id}>
-                          <a href={att.content_url} target="_blank" rel="noreferrer" className="attachment-link">
-                            {att.filename}
+                        isImage(att.filename) ? (
+                          <a
+                            key={att.id}
+                            href={att.content_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="attachment-image-item"
+                            title={att.filename}
+                          >
+                            <img
+                              src={att.content_url}
+                              alt={att.filename}
+                              className="attachment-image-preview"
+                              onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }}
+                            />
+                            <span className="attachment-image-name">{att.filename}</span>
                           </a>
-                          <span className="attachment-size">({Math.round(att.filesize / 1024)} KB)</span>
-                        </li>
+                        ) : (
+                          <a
+                            key={att.id}
+                            href={att.content_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="attachment-file-item"
+                          >
+                            <span className="attachment-file-icon">📎</span>
+                            <span className="attachment-file-info">
+                              <span className="attachment-file-name">{att.filename}</span>
+                              <span className="attachment-file-size">{formatBytes(att.filesize)}</span>
+                            </span>
+                          </a>
+                        )
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 )}
 
-                {/* Activity Journal */}
+                {/* ── Activity Journal ── */}
                 <div className="details-activity">
                   <h4 className="section-heading" style={{ marginTop: '24px', marginBottom: '12px' }}>Activity</h4>
 
@@ -397,8 +545,10 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                 </div>
               </div>
 
-              {/* Right sidebar — fields */}
+              {/* ── Right sidebar — fields ── */}
               <div className="drawer-sidebar">
+
+                {/* Status */}
                 <div className="control-group">
                   <label className="sidebar-label">Status</label>
                   <select
@@ -414,6 +564,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                   </select>
                 </div>
 
+                {/* Assignee */}
                 <div className="control-group">
                   <label className="sidebar-label">Assignee</label>
                   <select
@@ -430,6 +581,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                   </select>
                 </div>
 
+                {/* Priority */}
                 <div className="control-group">
                   <label className="sidebar-label">Priority</label>
                   <select
@@ -443,6 +595,45 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                   </select>
                 </div>
 
+                {/* Done Ratio */}
+                <div className="control-group">
+                  <label className="sidebar-label">
+                    Progress
+                    <span className="sidebar-label-meta">
+                      {fullIssue?.done_ratio ?? displayIssue.done_ratio ?? 0}%
+                    </span>
+                  </label>
+                  <div className="progress-bar-wrapper">
+                    <div
+                      className="progress-bar-fill"
+                      style={{ width: `${fullIssue?.done_ratio ?? displayIssue.done_ratio ?? 0}%` }}
+                    />
+                  </div>
+                  <input
+                    type="range"
+                    className="progress-range"
+                    min="0"
+                    max="100"
+                    step="10"
+                    value={fullIssue?.done_ratio ?? displayIssue.done_ratio ?? 0}
+                    onChange={e => setFullIssue(prev => ({ ...(prev || displayIssue), done_ratio: parseInt(e.target.value) }))}
+                    onMouseUp={e => handleFieldUpdate('done_ratio', parseInt(e.target.value))}
+                    onTouchEnd={e => handleFieldUpdate('done_ratio', parseInt(e.target.value))}
+                  />
+                </div>
+
+                {/* Start Date */}
+                <div className="control-group">
+                  <label className="sidebar-label">Start Date</label>
+                  <input
+                    type="date"
+                    className="details-input"
+                    value={fullIssue?.start_date || displayIssue.start_date || ''}
+                    onChange={e => handleFieldUpdate('start_date', e.target.value || null)}
+                  />
+                </div>
+
+                {/* Due Date */}
                 <div className="control-group">
                   <label className="sidebar-label">Due Date</label>
                   <input
@@ -453,6 +644,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                   />
                 </div>
 
+                {/* Estimated Hours */}
                 <div className="control-group">
                   <label className="sidebar-label">Est. Hours</label>
                   <input
@@ -467,6 +659,41 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                   />
                 </div>
 
+                {/* Category */}
+                {categories.length > 0 && (
+                  <div className="control-group">
+                    <label className="sidebar-label">Category</label>
+                    <select
+                      className="details-select"
+                      value={fullIssue?.category?.id || ''}
+                      onChange={e => handleFieldUpdate('category_id', e.target.value || null)}
+                    >
+                      <option value="">None</option>
+                      {categories.map(c => (
+                        <option key={c.id} value={c.id}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Version / Milestone */}
+                {versions.length > 0 && (
+                  <div className="control-group">
+                    <label className="sidebar-label">Milestone</label>
+                    <select
+                      className="details-select"
+                      value={fullIssue?.fixed_version?.id || ''}
+                      onChange={e => handleFieldUpdate('fixed_version_id', e.target.value || null)}
+                    >
+                      <option value="">None</option>
+                      {versions.filter(v => v.status === 'open').map(v => (
+                        <option key={v.id} value={v.id}>{v.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Updated */}
                 <div className="control-group">
                   <label className="sidebar-label">Updated</label>
                   <div className="sidebar-value text-sm">
@@ -476,6 +703,19 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                     })}
                   </div>
                 </div>
+
+                {/* Created */}
+                {displayIssue.created_on && (
+                  <div className="control-group">
+                    <label className="sidebar-label">Created</label>
+                    <div className="sidebar-value text-sm">
+                      {new Date(displayIssue.created_on).toLocaleString('en-US', {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </>

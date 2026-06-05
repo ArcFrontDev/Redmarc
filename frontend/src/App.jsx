@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import './App.css';
 
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -11,6 +11,7 @@ import { CreateIssueModal } from './components/CreateIssueModal';
 import { CreateProjectModal } from './components/CreateProjectModal';
 import { DeleteConfirmModal } from './components/DeleteConfirmModal';
 import { ContextMenu } from './components/ContextMenu';
+import { HotkeysModal } from './components/HotkeysModal';
 import CommandPalette from './components/CommandPalette';
 
 import { useAppData } from './hooks/useAppData';
@@ -21,6 +22,7 @@ import { groupIssuesByColumn } from './utils/statusMapping';
 
 function App() {
   const { theme, setTheme, toggleTheme } = useTheme();
+  const searchRef = useRef(null);
 
   const {
     issues, projects, statuses, users,
@@ -47,12 +49,14 @@ function App() {
   const [deleteConfirm, setDeleteConfirm]             = useState({ isOpen: false, project: null });
   const [contextMenu, setContextMenu]                 = useState({ visible: false, x: 0, y: 0, project: null });
   const [isCommandOpen, setIsCommandOpen]             = useState(false);
+  const [isHotkeysOpen, setIsHotkeysOpen]             = useState(false);
 
-  const isAnyModalOpen = isCreateIssueOpen || isCreateProjectOpen || deleteConfirm.isOpen;
+  const isAnyModalOpen = isCreateIssueOpen || isCreateProjectOpen || deleteConfirm.isOpen || isHotkeysOpen;
 
   const closeAll = useCallback(() => {
     setSelectedIssue(null);
     setIsCommandOpen(false);
+    setIsHotkeysOpen(false);
     setContextMenu({ visible: false, x: 0, y: 0, project: null });
   }, []);
 
@@ -71,6 +75,10 @@ function App() {
     onToggleCommandPalette: () => setIsCommandOpen(o => !o),
     onDeleteActiveProject:  handleDeleteActiveProject,
     onCloseAll:             closeAll,
+    onKanbanView:           () => setView('kanban'),
+    onListView:             () => setView('list'),
+    onFocusSearch:          () => searchRef.current?.focus(),
+    onOpenHotkeys:          () => setIsHotkeysOpen(o => !o),
     activeProject,
     projects,
     isAnyModalOpen,
@@ -165,6 +173,7 @@ function App() {
           }}
           issues={issues}
           loading={loading}
+          onOpenHotkeys={() => setIsHotkeysOpen(true)}
         />
 
         <main className="app-workspace">
@@ -175,6 +184,7 @@ function App() {
             onSetView={setView}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
+            searchRef={searchRef}
             filterUser={filterUser}
             filterStatus={filterStatus}
             onClearFilters={() => { setFilterUser(null); setFilterStatus(null); setSearchQuery(''); }}
@@ -274,6 +284,10 @@ function App() {
             onConfirm={handleDeleteProject}
             onClose={() => setDeleteConfirm({ isOpen: false, project: null })}
           />
+        )}
+
+        {isHotkeysOpen && (
+          <HotkeysModal onClose={() => setIsHotkeysOpen(false)} />
         )}
 
         {contextMenu.visible && (

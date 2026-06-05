@@ -13,8 +13,6 @@ const FolderIcon = () => (
   </svg>
 );
 
-
-
 export function Sidebar({
   projects,
   activeProject,
@@ -23,6 +21,7 @@ export function Sidebar({
   onDeleteProject,
   issues,
   loading,
+  onOpenHotkeys,
 }) {
   return (
     <aside className="app-sidebar">
@@ -80,42 +79,27 @@ export function Sidebar({
         })}
       </nav>
 
-      {/* Keyboard shortcuts reference */}
-      <div className="sidebar-hotkeys">
-        <div className="hotkey-item">
-          <span>Create issue</span>
-          <kbd>C</kbd>
-        </div>
-        <div className="hotkey-item">
-          <span>New project</span>
-          <kbd>P</kbd>
-        </div>
-        <div className="hotkey-item">
-          <span>Refresh</span>
-          <kbd>R</kbd>
-        </div>
-        <div className="hotkey-item">
-          <span>Command menu</span>
-          <kbd>Ctrl+K</kbd>
-        </div>
-        <div className="hotkey-item">
-          <span>Delete project</span>
-          <kbd>Del</kbd>
-        </div>
-      </div>
-
       {/* Footer */}
       <div className="sidebar-footer">
         <div className="api-status">
           <div className="status-indicator online" />
           <span>Redmarc Plugin</span>
         </div>
-        <div className="user-profile">
-          <div className="user-avatar">RM</div>
-          <div className="user-info">
-            <span className="user-name">Redmine User</span>
-            <span className="user-role">Connected</span>
+        <div className="sidebar-footer-row">
+          <div className="user-profile">
+            <div className="user-avatar">RM</div>
+            <div className="user-info">
+              <span className="user-name">Redmine User</span>
+              <span className="user-role">Connected</span>
+            </div>
           </div>
+          <button
+            className="hotkeys-trigger-btn"
+            onClick={onOpenHotkeys}
+            title="Keyboard shortcuts (?)"
+          >
+            ?
+          </button>
         </div>
       </div>
     </aside>

@@ -60,6 +60,7 @@ export function AppHeader({
   onSetView,
   searchQuery,
   onSearchChange,
+  searchRef,
   filterUser,
   filterStatus,
   onClearFilters,
@@ -91,9 +92,10 @@ export function AppHeader({
         <div className="header-search-bar">
           <SearchIcon />
           <input
+            ref={searchRef}
             type="text"
             className="search-input"
-            placeholder="Search issues..."
+            placeholder="Search issues... (F)"
             value={searchQuery}
             onChange={e => onSearchChange(e.target.value)}
           />
