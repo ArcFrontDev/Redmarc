@@ -1,61 +1,61 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* ==========================================================================
-   DARK THEME — "Slate Studio"
-   Philosophy: no pure black, no neon, no blur. Mid-tone slate grays with a
-   warm blue undertone. Every surface has its own distinct shade so nothing
-   merges into the background. Accent is a calm desaturated sky-blue.
+   DARK THEME — "Carbon Studio"
+   Philosophy: neutral dark greys with zero blue saturation. No eye strain.
+   Accent is a calm steel-grey. Status colors remain distinct and meaningful.
    ========================================================================== */
 :root {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   color-scheme: dark;
-  color: #d4d8e8;
-  background-color: #1e2130;
+  color: #d0d3db;
+  background-color: #1a1b1e;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* ── Backgrounds (each layer is visibly distinct) ── */
-  --bg-app:          #1e2130;   /* outermost — dark slate-blue */
-  --bg-sidebar:      #252a3d;   /* sidebar — slightly lighter, blue-tinted */
-  --bg-surface:      #2c3149;   /* panels, drawers */
-  --bg-card:         #333a52;   /* cards — clearly above surface */
-  --bg-column:       #29304a;   /* kanban column bg — between sidebar and card */
-  --bg-modal:        #2c3149;   /* modal dialogs */
-  --bg-input:        rgba(255,255,255, 0.06);
-  --bg-hover:        rgba(255,255,255, 0.05);
-  --bg-sidebar-footer: rgba(0,0,0, 0.18);
+  /* ── Backgrounds — pure neutral greys, no blue tint ── */
+  --bg-app:          #1a1b1e;   /* outermost — near-black neutral */
+  --bg-sidebar:      #202126;   /* sidebar */
+  --bg-surface:      #262830;   /* panels, drawers — slight depth */
+  --bg-card:         #2e3038;   /* cards */
+  --bg-column:       #22242b;   /* kanban column */
+  --bg-modal:        #262830;   /* modal dialogs */
+  --bg-input:        rgba(255,255,255, 0.07);
+  --bg-hover:        rgba(255,255,255, 0.06);
+  --bg-sidebar-footer: rgba(0,0,0, 0.25);
+  --border-default:  rgba(255,255,255, 0.13);
 
-  /* ── Borders — layered subtle visibility ── */
-  --border-subtle:   rgba(255,255,255, 0.09);
-  --border-column:   rgba(255,255,255, 0.10);
-  --border-focus:    rgba(108, 142, 191, 0.60);
+  /* ── Borders ── */
+  --border-subtle:   rgba(255,255,255, 0.10);
+  --border-column:   rgba(255,255,255, 0.11);
+  --border-focus:    rgba(140, 160, 185, 0.55);
 
   /* ── Text ── */
-  --text-primary:   #d4d8e8;   /* warm light lavender-white */
-  --text-secondary: #8b91aa;   /* mid-tone blue-gray */
-  --text-muted:     #555d7a;   /* visible but subdued */
+  --text-primary:   #d0d3db;   /* light grey-white */
+  --text-secondary: #8a8f9e;   /* mid-tone grey */
+  --text-muted:     #585e70;   /* subdued, still readable */
 
-  /* ── Accent — desaturated sky blue (calm, professional) ── */
-  --color-accent:        #6c8ebf;
-  --color-accent-hover:  #7fa3d4;
-  --color-accent-glow:   rgba(108, 142, 191, 0.14);
+  /* ── Accent — neutral steel grey, no harsh blue ── */
+  --color-accent:        #8899aa;
+  --color-accent-hover:  #9aaabb;
+  --color-accent-glow:   rgba(136, 153, 170, 0.13);
 
-  /* ── Kanban status colors — muted, not neon ── */
-  --color-todo:     #7aa2c8;   /* soft blue */
-  --color-progress: #c89d5a;   /* amber-warm */
-  --color-review:   #9b7ec8;   /* muted purple */
-  --color-done:     #5aa88a;   /* desaturated teal-green */
-  --color-closed:   #5a6278;   /* gray */
+  /* ── Kanban status colors — distinct, purposeful ── */
+  --color-todo:     #6b8fb5;   /* slate blue */
+  --color-progress: #c49040;   /* amber-gold */
+  --color-review:   #d07040;   /* warm orange — clearly different from todo */
+  --color-done:     #3daa74;   /* teal-green, brighter */
+  --color-closed:   #505666;   /* grey */
 
-  /* ── Shadows — depth without glow ── */
+  /* ── Shadows ── */
   --shadow-card:       none;
-  --shadow-card-hover: 0 4px 18px rgba(0,0,0, 0.35);
-  --shadow-premium:    0 10px 32px rgba(0,0,0, 0.45);
-  --shadow-modal:      0 20px 60px rgba(0,0,0, 0.55);
+  --shadow-card-hover: 0 4px 18px rgba(0,0,0, 0.40);
+  --shadow-premium:    0 10px 32px rgba(0,0,0, 0.50);
+  --shadow-modal:      0 20px 60px rgba(0,0,0, 0.60);
 
   /* ── Shape ── */
   --radius-sm: 6px;
@@ -67,52 +67,51 @@
   --transition-spring: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
   /* ── Misc ── */
-  --modal-overlay-bg: rgba(8, 10, 18, 0.70);
-  --card-hover-bg:    #3a4260;
+  --modal-overlay-bg: rgba(8, 10, 14, 0.75);
+  --card-hover-bg:    #353840;
 }
 
 /* ==========================================================================
    LIGHT THEME — "Warm Paper"
-   Philosophy: warm cream base (NOT white), high contrast borders for outdoor
-   readability, every element has its own distinct warm tone. Accent is ink-blue.
    ========================================================================== */
 body.light-theme {
   color-scheme: light;
 
-  /* ── Backgrounds (warm cream palette, nothing is pure white except cards) ── */
-  --bg-app:          #ebe8e0;   /* warm parchment — overall background */
-  --bg-sidebar:      #e2ddd6;   /* sidebar — slightly darker warm */
-  --bg-surface:      #f0ede6;   /* panels, drawers — lightest warm */
-  --bg-card:         #faf8f4;   /* cards — off-white warm, clearly above surface */
-  --bg-column:       #dedad2;   /* kanban column — distinct warm gray */
-  --bg-modal:        #f5f2eb;   /* modals */
-  --bg-input:        rgba(0,0,0, 0.06);
-  --bg-hover:        rgba(0,0,0, 0.05);
-  --bg-sidebar-footer: rgba(0,0,0, 0.08);
+  /* ── Backgrounds ── */
+  --bg-app:          #ebe8e0;
+  --bg-sidebar:      #e2ddd6;
+  --bg-surface:      #f0ede6;
+  --bg-card:         #faf8f4;
+  --bg-column:       #dedad2;
+  --bg-modal:        #f5f2eb;
+  --bg-input:        rgba(0,0,0, 0.07);
+  --bg-hover:        rgba(0,0,0, 0.06);
+  --bg-sidebar-footer: rgba(0,0,0, 0.09);
+  --border-default:  rgba(0,0,0, 0.20);
 
-  /* ── Borders — strong enough for outdoor/bright light ── */
-  --border-subtle:   #ccc8be;   /* solid warm border — clearly visible */
+  /* ── Borders ── */
+  --border-subtle:   #ccc8be;
   --border-column:   #c4c0b6;
   --border-focus:    rgba(74, 111, 165, 0.55);
 
   /* ── Text ── */
-  --text-primary:   #2a2520;   /* warm near-black */
-  --text-secondary: #6a6055;   /* warm brown-gray */
-  --text-muted:     #9a9088;   /* readable muted warm */
+  --text-primary:   #2a2520;
+  --text-secondary: #6a6055;
+  --text-muted:     #9a9088;
 
-  /* ── Accent — ink blue (calm, anchored) ── */
+  /* ── Accent ── */
   --color-accent:        #4a6fa5;
   --color-accent-hover:  #5a82ba;
   --color-accent-glow:   rgba(74, 111, 165, 0.10);
 
-  /* ── Kanban status colors — rich but not neon ── */
-  --color-todo:     #3d74b0;   /* solid blue */
-  --color-progress: #b5720a;   /* amber */
-  --color-review:   #6b45a8;   /* purple */
-  --color-done:     #1e8a5e;   /* forest green */
-  --color-closed:   #7a7068;   /* warm gray */
+  /* ── Kanban status ── */
+  --color-todo:     #3d74b0;
+  --color-progress: #b5720a;
+  --color-review:   #c05c1a;   /* warm orange for review */
+  --color-done:     #1e8a5e;
+  --color-closed:   #7a7068;
 
-  /* ── Shadows — crisp, editorial ── */
+  /* ── Shadows ── */
   --shadow-card:       0 1px 4px rgba(0,0,0, 0.08), 0 1px 2px rgba(0,0,0, 0.05);
   --shadow-card-hover: 0 4px 14px rgba(0,0,0, 0.14), 0 2px 4px rgba(0,0,0, 0.08);
   --shadow-premium:    0 10px 30px rgba(0,0,0, 0.12);
@@ -165,8 +164,8 @@ body {
    ========================================================================== */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255, 0.10); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255, 0.18); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255, 0.11); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255, 0.20); }
 body.light-theme ::-webkit-scrollbar-thumb { background: rgba(0,0,0, 0.15); }
 body.light-theme ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0, 0.25); }
 
@@ -184,7 +183,7 @@ body.light-theme ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0, 0.25)
   justify-content: center;
   flex-shrink: 0;
   margin-right: 4px;
-  border: 1px solid rgba(108, 142, 191, 0.22);
+  border: 1px solid rgba(136, 153, 170, 0.22);
 }
 
 body.light-theme .brand-logo-circle {
@@ -192,7 +191,7 @@ body.light-theme .brand-logo-circle {
 }
 
 /* ==========================================================================
-   Buttons — solid, no box-shadow glow
+   Buttons
    ========================================================================== */
 .btn {
   display: inline-flex;
@@ -214,7 +213,7 @@ body.light-theme .brand-logo-circle {
 
 .btn:hover {
   background: rgba(255,255,255, 0.13);
-  border-color: rgba(255,255,255, 0.15);
+  border-color: rgba(255,255,255, 0.18);
   transform: translateY(-1px);
 }
 
@@ -274,8 +273,8 @@ body.light-theme .btn-secondary:hover {
   width: 32px;
   height: 32px;
   padding: 0;
-  background: rgba(255,255,255, 0.06);
-  border: 1px solid var(--border-subtle);
+  background: rgba(255,255,255, 0.08);
+  border: 1px solid rgba(255,255,255, 0.14);
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
   display: inline-flex;
@@ -284,20 +283,20 @@ body.light-theme .btn-secondary:hover {
 }
 
 .btn-icon:hover {
-  background: rgba(255,255,255, 0.11);
-  border-color: rgba(255,255,255, 0.15);
+  background: rgba(255,255,255, 0.14);
+  border-color: rgba(255,255,255, 0.22);
   color: var(--text-primary);
   transform: translateY(0);
 }
 
 body.light-theme .btn-icon {
-  background: rgba(0,0,0, 0.06);
+  background: rgba(0,0,0, 0.07);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
 }
 
 body.light-theme .btn-icon:hover {
-  background: rgba(0,0,0, 0.10);
+  background: rgba(0,0,0, 0.12);
   color: var(--text-primary);
 }
 
@@ -307,10 +306,10 @@ body.light-theme .btn-icon:hover {
 }
 
 /* ==========================================================================
-   Command Palette backdrop — minimal blur only here
+   Command Palette backdrop
    ========================================================================== */
 .glass-panel {
-  background: rgba(37, 42, 61, 0.97);
+  background: rgba(32, 33, 38, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-subtle);
@@ -346,8 +345,8 @@ kbd {
   padding: 2px 6px;
   font-size: 10px;
   font-family: monospace;
-  background: rgba(255,255,255, 0.08);
-  border: 1px solid rgba(255,255,255, 0.14);
+  background: rgba(255,255,255, 0.09);
+  border: 1px solid rgba(255,255,255, 0.16);
   border-radius: 4px;
   color: var(--text-secondary);
 }
@@ -358,14 +357,12 @@ body.light-theme kbd {
 }
 
 /* ==========================================================================
-   Sidebar section shading — each sub-zone has its own tone
+   Sidebar section shading
    ========================================================================== */
-.app-sidebar .brand-header { background: rgba(0,0,0, 0.14); }
+.app-sidebar .brand-header { background: rgba(0,0,0, 0.18); }
 body.light-theme .app-sidebar .brand-header { background: rgba(0,0,0, 0.06); }
-.app-sidebar .sidebar-footer { background: rgba(0,0,0, 0.18); }
+.app-sidebar .sidebar-footer { background: rgba(0,0,0, 0.25); }
 body.light-theme .app-sidebar .sidebar-footer { background: rgba(0,0,0, 0.08); }
-.app-sidebar .sidebar-hotkeys { background: rgba(0,0,0, 0.10); }
-body.light-theme .app-sidebar .sidebar-hotkeys { background: rgba(0,0,0, 0.05); }
 
 /* ==========================================================================
    Error Boundary
@@ -414,7 +411,7 @@ body.light-theme .app-sidebar .sidebar-hotkeys { background: rgba(0,0,0, 0.05); 
   position: fixed;
   top: 0; left: 0;
   width: 100vw; height: 100vh;
-  background: rgba(0,0,0, 0.50);
+  background: rgba(0,0,0, 0.55);
   backdrop-filter: blur(3px);
   z-index: -1;
   animation: fadeIn 0.15s ease-out forwards;
@@ -425,7 +422,7 @@ body.light-theme .app-sidebar .sidebar-hotkeys { background: rgba(0,0,0, 0.05); 
   max-width: 580px;
   border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 16px 48px rgba(0,0,0, 0.55), 0 0 0 1px var(--border-subtle);
+  box-shadow: 0 16px 48px rgba(0,0,0, 0.60), 0 0 0 1px var(--border-subtle);
   animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -499,7 +496,7 @@ body.light-theme .app-sidebar .sidebar-hotkeys { background: rgba(0,0,0, 0.05); 
   align-items: center;
   justify-content: center;
   width: 22px; height: 22px;
-  background: rgba(255,255,255, 0.06);
+  background: rgba(255,255,255, 0.07);
   border-radius: 5px;
   font-size: 12px;
   color: var(--text-secondary);

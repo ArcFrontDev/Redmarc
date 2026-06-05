@@ -39,9 +39,13 @@ function App() {
   const [view, setView]                   = useState('kanban');
   const [activeProject, setActiveProject] = useState('all');
   const [selectedIssue, setSelectedIssue] = useState(null);
+  const [detailInitialFocus, setDetailInitialFocus] = useState(null);
   const [searchQuery, setSearchQuery]     = useState('');
   const [filterUser, setFilterUser]       = useState(null);
   const [filterStatus, setFilterStatus]   = useState(null);
+
+  // Keyboard card focus
+  const [focusedCard, setFocusedCard]     = useState(null);
 
   // Modal state
   const [isCreateIssueOpen, setIsCreateIssueOpen]     = useState(false);
@@ -67,22 +71,6 @@ function App() {
   const handleDeleteActiveProject = useCallback(project => {
     openDeleteConfirm(project);
   }, [openDeleteConfirm]);
-
-  useKeyboard({
-    onCreateIssue:          () => setIsCreateIssueOpen(true),
-    onCreateProject:        () => setIsCreateProjectOpen(true),
-    onRefresh:              loadData,
-    onToggleCommandPalette: () => setIsCommandOpen(o => !o),
-    onDeleteActiveProject:  handleDeleteActiveProject,
-    onCloseAll:             closeAll,
-    onKanbanView:           () => setView('kanban'),
-    onListView:             () => setView('list'),
-    onFocusSearch:          () => searchRef.current?.focus(),
-    onOpenHotkeys:          () => setIsHotkeysOpen(o => !o),
-    activeProject,
-    projects,
-    isAnyModalOpen,
-  });
 
   const handleUpdateStatus = useCallback((issueId, statusId) => {
     updateIssueStatus(issueId, statusId, statuses).catch(() => {});
@@ -120,13 +108,13 @@ function App() {
     });
   }, [issues, activeProject, searchQuery, filterUser, filterStatus]);
 
-  // Base grouped (no sort order) — needed by DnD hook
+  // Base grouped (no sort order)
   const baseGrouped = useMemo(
     () => groupIssuesByColumn(filteredIssues, {}),
     [filteredIssues]
   );
 
-  // DnD hook — owns sort order + handleDragEnd
+  // DnD hook
   const { sortOrder, handleDragEnd } = useDragAndDrop({
     groupedIssues: baseGrouped,
     statuses,
@@ -138,6 +126,40 @@ function App() {
     () => groupIssuesByColumn(filteredIssues, sortOrder),
     [filteredIssues, sortOrder]
   );
+
+  // Open focused card helper
+  const openFocusedCard = useCallback((focus = null) => {
+    if (!focusedCard) return;
+    const allIssues = Object.values(groupedIssues).flat();
+    const issue = allIssues.find(i => i.id === focusedCard.issueId);
+    if (issue) {
+      setDetailInitialFocus(focus);
+      setSelectedIssue(issue);
+    }
+  }, [focusedCard, groupedIssues]);
+
+  useKeyboard({
+    onCreateIssue:          () => setIsCreateIssueOpen(true),
+    onCreateProject:        () => setIsCreateProjectOpen(true),
+    onRefresh:              loadData,
+    onToggleCommandPalette: () => setIsCommandOpen(o => !o),
+    onDeleteActiveProject:  handleDeleteActiveProject,
+    onCloseAll:             closeAll,
+    onToggleView:           () => setView(v => v === 'kanban' ? 'list' : 'kanban'),
+    onFocusSearch:          () => searchRef.current?.focus(),
+    onOpenHotkeys:          () => setIsHotkeysOpen(o => !o),
+    activeProject,
+    projects,
+    isAnyModalOpen,
+    // Card navigation
+    groupedIssues,
+    focusedCard,
+    setFocusedCard,
+    onOpenFocusedCard:  () => openFocusedCard(null),
+    onQuickAssign:      () => openFocusedCard('assignee'),
+    onQuickStatus:      () => openFocusedCard('status'),
+    onQuickEdit:        () => openFocusedCard('title'),
+  });
 
   const handleCreateIssue = useCallback(async issueData => {
     await createIssue(issueData);
@@ -198,7 +220,7 @@ function App() {
 
           {error && (
             <div className="error-panel">
-              <div className="error-icon">⚠️</div>
+              <div className="error-icon">&#9888;</div>
               <div className="error-text">
                 <h4>Server connection error</h4>
                 <p>{error}</p>
@@ -217,16 +239,17 @@ function App() {
           {!loading && !error && view === 'kanban' && (
             <KanbanBoard
               groupedIssues={groupedIssues}
-              onIssueClick={setSelectedIssue}
+              onIssueClick={issue => { setDetailInitialFocus(null); setSelectedIssue(issue); }}
               onAddIssue={() => setIsCreateIssueOpen(true)}
               onDragEnd={handleDragEnd}
+              focusedCardId={focusedCard?.issueId || null}
             />
           )}
 
           {!loading && !error && view === 'list' && (
             <ListView
               issues={filteredIssues}
-              onIssueClick={setSelectedIssue}
+              onIssueClick={issue => { setDetailInitialFocus(null); setSelectedIssue(issue); }}
             />
           )}
 
@@ -253,10 +276,11 @@ function App() {
           issue={selectedIssue}
           statuses={statuses}
           users={users}
-          onClose={() => setSelectedIssue(null)}
+          onClose={() => { setSelectedIssue(null); setDetailInitialFocus(null); }}
           onUpdateStatus={handleUpdateStatus}
           onAssignUser={handleAssignUser}
           onIssueUpdated={handleIssueUpdated}
+          initialFocus={detailInitialFocus}
         />
 
         {isCreateIssueOpen && (
