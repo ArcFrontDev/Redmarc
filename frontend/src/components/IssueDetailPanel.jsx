@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { formatStatusName } from '../utils/statusMapping';
+import { formatStatusName, getColumnForStatus } from '../utils/statusMapping';
 import { api } from '../utils/api';
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
@@ -139,7 +139,7 @@ const PRIORITIES = [
   { id: 5, label: 'Immediate' },
 ];
 
-export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStatus, onAssignUser, onIssueUpdated }) {
+export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStatus, onAssignUser, onIssueUpdated, initialFocus }) {
   const isOpen = Boolean(issue);
   const [fullIssue, setFullIssue] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -237,6 +237,14 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
   useEffect(() => {
     if (isEditingTitle && titleRef.current) titleRef.current.focus();
   }, [isEditingTitle]);
+
+  // ── Handle initialFocus (from keyboard shortcut) ─────────────────────────
+  useEffect(() => {
+    if (!initialFocus || !isOpen) return;
+    if (initialFocus === 'title') {
+      setTimeout(() => setIsEditingTitle(true), 80);
+    }
+  }, [initialFocus, isOpen]);
 
   // ── Inline edit handlers ─────────────────────────────────────────────────
   const handleSaveTitle = async () => {
@@ -617,7 +625,19 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                     step="10"
                     value={fullIssue?.done_ratio ?? displayIssue.done_ratio ?? 0}
                     onChange={e => setFullIssue(prev => ({ ...(prev || displayIssue), done_ratio: parseInt(e.target.value) }))}
-                    onMouseUp={e => handleFieldUpdate('done_ratio', parseInt(e.target.value))}
+                    onMouseUp={e => {
+                      const val = parseInt(e.target.value);
+                      handleFieldUpdate('done_ratio', val);
+                      // Auto-status: move to matching column
+                      const currentCol = getColumnForStatus(displayIssue.status?.name);
+                      let targetCol = null;
+                      if (val === 100 && currentCol !== 'done') targetCol = 'done';
+                      else if (val >= 1 && val < 100 && currentCol === 'todo') targetCol = 'progress';
+                      if (targetCol) {
+                        const ts = statuses.find(s => getColumnForStatus(s.name) === targetCol);
+                        if (ts) onUpdateStatus(displayIssue.id, ts.id);
+                      }
+                    }}
                     onTouchEnd={e => handleFieldUpdate('done_ratio', parseInt(e.target.value))}
                   />
                 </div>
@@ -627,6 +647,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                   <label className="sidebar-label">Start Date</label>
                   <input
                     type="date"
+                    lang="en"
                     className="details-input"
                     value={fullIssue?.start_date || displayIssue.start_date || ''}
                     onChange={e => handleFieldUpdate('start_date', e.target.value || null)}
@@ -638,6 +659,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                   <label className="sidebar-label">Due Date</label>
                   <input
                     type="date"
+                    lang="en"
                     className="details-input"
                     value={fullIssue?.due_date || displayIssue.due_date || ''}
                     onChange={e => handleFieldUpdate('due_date', e.target.value || null)}

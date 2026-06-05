@@ -2,29 +2,40 @@ import React, { useEffect } from 'react';
 
 const HOTKEYS = [
   {
-    section: 'Navigation',
+    section: 'Global Actions',
     items: [
-      { keys: ['Ctrl', 'K'], description: 'Open command palette' },
-      { keys: ['K'], description: 'Kanban view' },
-      { keys: ['L'], description: 'List view' },
+      { keys: ['C'], description: 'Create new issue' },
+      { keys: ['P'], description: 'Create new project' },
       { keys: ['R'], description: 'Refresh data' },
-      { keys: ['Esc'], description: 'Close panel / modal' },
+      { keys: ['Ctrl', 'K'], description: 'Open command palette' },
       { keys: ['?'], description: 'Show this help' },
+      { keys: ['Esc'], description: 'Close panel / cancel' },
     ],
   },
   {
-    section: 'Issues',
+    section: 'Board Navigation',
     items: [
-      { keys: ['C'], description: 'Create new issue' },
-      { keys: ['E'], description: 'Edit selected issue title' },
+      { keys: ['J', '↓'], description: 'Focus card below' },
+      { keys: ['K', '↑'], description: 'Focus card above' },
+      { keys: ['H', '←'], description: 'Move focus to previous column' },
+      { keys: ['L', '→'], description: 'Move focus to next column' },
+      { keys: ['Enter', 'Space'], description: 'Open focused card' },
+      { keys: ['V'], description: 'Toggle Kanban / List view' },
       { keys: ['F'], description: 'Focus search bar' },
+    ],
+  },
+  {
+    section: 'Quick Actions (on focused card)',
+    items: [
+      { keys: ['A'], description: 'Quick assign — open detail & focus assignee' },
+      { keys: ['S'], description: 'Quick status — open detail & focus status' },
+      { keys: ['E'], description: 'Edit title — open detail in title edit mode' },
     ],
   },
   {
     section: 'Projects',
     items: [
-      { keys: ['P'], description: 'Create new project' },
-      { keys: ['Del'], description: 'Delete active project' },
+      { keys: ['Del'], description: 'Delete active project (confirm required)' },
     ],
   },
   {
@@ -32,14 +43,16 @@ const HOTKEYS = [
     items: [
       { keys: ['Space'], description: 'Pick up / drop card (keyboard DnD)' },
       { keys: ['← →'], description: 'Move card between columns' },
-      { keys: ['↑ ↓'], description: 'Reorder card within column' },
+      { keys: ['↑ ↓'], description: 'Reorder within column' },
     ],
   },
 ];
 
 export function HotkeysModal({ onClose }) {
   useEffect(() => {
-    const handler = e => { if (e.key === 'Escape' || e.key === '?') onClose(); };
+    const handler = e => {
+      if (e.key === 'Escape' || e.key === '?') onClose();
+    };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
@@ -55,7 +68,7 @@ export function HotkeysModal({ onClose }) {
       >
         <div className="hotkeys-modal-header">
           <span className="hotkeys-modal-title">Keyboard Shortcuts</span>
-          <button className="close-modal-btn" onClick={onClose} title="Close">✕</button>
+          <button className="close-modal-btn" onClick={onClose} title="Close">&#x2715;</button>
         </div>
 
         <div className="hotkeys-modal-body">
@@ -69,7 +82,7 @@ export function HotkeysModal({ onClose }) {
                     {item.keys.map((k, i) => (
                       <React.Fragment key={k}>
                         <kbd className="hotkey-kbd">{k}</kbd>
-                        {i < item.keys.length - 1 && <span className="hotkey-plus">+</span>}
+                        {i < item.keys.length - 1 && <span className="hotkey-plus">/</span>}
                       </React.Fragment>
                     ))}
                   </span>

@@ -13,28 +13,23 @@ import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { KanbanColumn } from './KanbanColumn';
 import { IssueCard } from './IssueCard';
 
-const COLUMNS = [
+export const KANBAN_COLUMNS = [
   { id: 'todo',     title: 'Backlog / New', dotClass: 'todo-dot' },
   { id: 'progress', title: 'In Progress',   dotClass: 'progress-dot' },
   { id: 'review',   title: 'Review / Test', dotClass: 'review-dot' },
   { id: 'done',     title: 'Done',          dotClass: 'done-dot' },
 ];
 
-export function KanbanBoard({ groupedIssues, onIssueClick, onAddIssue, onDragEnd }) {
+export function KanbanBoard({ groupedIssues, onIssueClick, onAddIssue, onDragEnd, focusedCardId }) {
   const [activeId, setActiveId] = useState(null);
   const [activeIssue, setActiveIssue] = useState(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8, // px before drag starts — prevents accidental drags on click
-      },
+      activationConstraint: { distance: 8 },
     }),
     useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 200,      // ms hold before drag starts on touch
-        tolerance: 6,    // px movement tolerance during hold
-      },
+      activationConstraint: { delay: 200, tolerance: 6 },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
@@ -42,9 +37,8 @@ export function KanbanBoard({ groupedIssues, onIssueClick, onAddIssue, onDragEnd
   );
 
   const handleDragStart = (event) => {
-    const { active } = event;
-    setActiveId(active.id);
-    setActiveIssue(active.data.current?.issue || null);
+    setActiveId(event.active.id);
+    setActiveIssue(event.active.data.current?.issue || null);
   };
 
   const handleDragEnd = (event) => {
@@ -53,21 +47,16 @@ export function KanbanBoard({ groupedIssues, onIssueClick, onAddIssue, onDragEnd
     if (onDragEnd) onDragEnd(event);
   };
 
-  const handleDragCancel = () => {
-    setActiveId(null);
-    setActiveIssue(null);
-  };
-
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCorners}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      onDragCancel={handleDragCancel}
+      onDragCancel={() => { setActiveId(null); setActiveIssue(null); }}
     >
       <div className="kanban-board">
-        {COLUMNS.map(col => (
+        {KANBAN_COLUMNS.map(col => (
           <KanbanColumn
             key={col.id}
             id={col.id}
@@ -76,7 +65,7 @@ export function KanbanBoard({ groupedIssues, onIssueClick, onAddIssue, onDragEnd
             issues={groupedIssues[col.id] || []}
             onIssueClick={onIssueClick}
             onAddIssue={() => onAddIssue(col.id)}
-            activeId={activeId}
+            focusedCardId={focusedCardId}
           />
         ))}
       </div>

@@ -9,7 +9,7 @@ const PlusSmIcon = () => (
   </svg>
 );
 
-export function KanbanColumn({ id, title, dotClass, issues, onIssueClick, onAddIssue }) {
+export function KanbanColumn({ id, title, dotClass, issues, onIssueClick, onAddIssue, focusedCardId }) {
   const { setNodeRef, isOver } = useDroppable({
     id,
     data: { col: id },
@@ -35,6 +35,7 @@ export function KanbanColumn({ id, title, dotClass, issues, onIssueClick, onAddI
                 key={issue.id}
                 issue={issue}
                 onClick={() => onIssueClick(issue)}
+                isFocused={focusedCardId === issue.id}
               />
             ))
           )}
