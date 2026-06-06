@@ -1,0 +1,10 @@
+tasks:
+  - name: Redmarc Sandbox Environment
+    init: |
+      cd frontend && npm install
+    command: |
+      docker-compose up
+ports:
+  - port: 8080
+    onOpen: open-preview
+    visibility: public

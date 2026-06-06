@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: redmine
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: redmine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U redmine"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redmine:
+    image: redmine:5.1
+    ports:
+      - "8080:3000"
+    environment:
+      REDMINE_DB_POSTGRES: db
+      REDMINE_DB_USERNAME: redmine
+      REDMINE_DB_PASSWORD: password
+      REDMINE_DB_DATABASE: redmine
+      REDMINE_SECRET_KEY_BASE: sandbox-secret-key
+    volumes:
+      - .:/usr/src/redmine/plugins/redmarc
+    depends_on:
+      db:
+        condition: service_healthy
+    command: |
+      sh -c "
+        echo 'production:' > config/database.yml
+        echo '  adapter: postgresql' >> config/database.yml
+        echo '  host: db' >> config/database.yml
+        echo '  database: redmine' >> config/database.yml
+        echo '  username: redmine' >> config/database.yml
+        echo '  password: password' >> config/database.yml
+        echo '  encoding: utf8' >> config/database.yml
+        echo 'Generating secret token...' &&
+        bundle exec rake generate_secret_token &&
+        echo 'Running core database migrations...' &&
+        bundle exec rake db:migrate &&
+        bundle exec rake redmine:plugins:migrate &&
+        echo 'Seeding Sandbox demo data...' &&
+        bundle exec rails runner plugins/redmarc/sandbox/demo-seed.rb &&
+        echo 'Starting Redmine server...' &&
+        rails server -b 0.0.0.0
+      "
+
+volumes:
+  pgdata:
