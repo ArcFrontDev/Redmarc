@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { formatStatusName, getColumnForStatus } from '../utils/statusMapping';
 import { api } from '../utils/api';
 
@@ -253,6 +253,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
   // Fetch full issue on open
   useEffect(() => {
     if (!isOpen || !issue) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFullIssue(null);
       setCommentText('');
       setCategories([]);
@@ -297,6 +298,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
   // Update watch when currentUserId loads after fullIssue
   useEffect(() => {
     if (currentUserId && fullIssue?.watchers) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsWatching(fullIssue.watchers.some(w => w.id === currentUserId));
     }
   }, [currentUserId, fullIssue]);
@@ -317,7 +319,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
         if (statusSelectRef.current) {
           statusSelectRef.current.focus();
           //Trigger native picker open on supported browsers
-          try { statusSelectRef.current.showPicker?.(); } catch (_) {}
+          try { statusSelectRef.current.showPicker?.(); } catch { /* ignore */ }
         }
       }, 120);
     }
@@ -463,7 +465,8 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                 <button
                   className="btn btn-icon"
                   onClick={handleCopyLink}
-                  title={copied ? 'Copied!' : 'Copy link to issue'}
+                  data-tooltip={copied ? 'Copied!' : 'Copy link to issue'}
+                  data-tooltip-left
                   style={copied ? { color: 'var(--color-done)' } : {}}
                 >
                   <CopyIcon />
@@ -475,18 +478,31 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                     className={`btn btn-icon ${isWatching ? 'btn-watching' : ''}`}
                     onClick={handleToggleWatch}
                     disabled={watchLoading}
-                    title={isWatching ? 'Unwatch issue' : 'Watch issue'}
+                    data-tooltip={isWatching ? 'Unwatch issue' : 'Watch issue'}
+                    data-tooltip-left
                   >
                     {isWatching ? <EyeOffIcon /> : <EyeIcon />}
                   </button>
                 )}
 
                 {/* Open in Redmine */}
-                <a href={redmineIssueUrl} target="_blank" rel="noreferrer" className="btn btn-icon" title="Open in Redmine">
+                <a
+                  href={redmineIssueUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-icon"
+                  data-tooltip="Open in Redmine"
+                  data-tooltip-left
+                >
                   <ExternalIcon />
                 </a>
 
-                <button className="close-modal-btn" onClick={onClose} title="Close (Esc)">
+                <button
+                  className="close-modal-btn"
+                  onClick={onClose}
+                  data-tooltip="Close (Esc)"
+                  data-tooltip-left
+                >
                   <XIcon />
                 </button>
               </div>
@@ -510,7 +526,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                   <h2
                     className="details-title editable"
                     onClick={() => setIsEditingTitle(true)}
-                    title="Click to edit"
+                    data-tooltip="Edit title (E)"
                   >
                     {displayIssue.subject}
                   </h2>
@@ -660,7 +676,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
 
                 {/* Status */}
                 <div className="control-group">
-                  <label className="sidebar-label">Status</label>
+                  <label className="sidebar-label" data-tooltip="Status (S)">Status</label>
                   <select
                     ref={statusSelectRef}
                     className="details-select"
@@ -677,7 +693,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
 
                 {/* Assignee */}
                 <div className="control-group">
-                  <label className="sidebar-label">Assignee</label>
+                  <label className="sidebar-label" data-tooltip="Assignee (A)">Assignee</label>
                   <select
                     className="details-select"
                     value={displayIssue.assigned_to?.id || ''}
@@ -845,7 +861,8 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                         setIsAddingSubtask(true);
                         setTimeout(() => subtaskInputRef.current?.focus(), 60);
                       }}
-                      title="Add subtask"
+                      data-tooltip="Add subtask"
+                      data-tooltip-left
                     >
                       +
                     </button>

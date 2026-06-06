@@ -1,5 +1,4 @@
-import React from 'react';
-import { getPriorityConfig, getColumnForStatus } from '../utils/statusMapping';
+import { getColumnForStatus } from '../utils/statusMapping';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -24,7 +23,23 @@ const PRIORITY_LABELS = {
   1: 'Low', 2: 'Normal', 3: 'High', 4: 'Urgent', 5: 'Immediate',
 };
 
-export function IssueCard({ issue, onClick, isOverlay, isFocused }) {
+const AlertIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}>
+    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+    <line x1="12" y1="9" x2="12" y2="13" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
+  </svg>
+);
+
+const MoreHorizontalIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="1" />
+    <circle cx="19" cy="12" r="1" />
+    <circle cx="5" cy="12" r="1" />
+  </svg>
+);
+
+export function IssueCard({ issue, onClick, isOverlay, isFocused, isCompact }) {
   const priorityId = issue.priority?.id || 2;
   const priorityColor = PRIORITY_COLORS[priorityId] || PRIORITY_COLORS[2];
   const priorityLabel = PRIORITY_LABELS[priorityId] || 'Normal';
@@ -82,85 +97,117 @@ export function IssueCard({ issue, onClick, isOverlay, isFocused }) {
       {...attributes}
       {...listeners}
     >
-      {/* Left priority strip */}
-      <div
-        className="card-priority-strip"
-        style={{ backgroundColor: priorityColor }}
-        title={`Priority: ${priorityLabel}`}
-      />
-
-      <div className="card-body">
-        {/* Top row: project tag + status dot + priority badge */}
-        <div className="card-top-row">
-          <div className="card-project-tag">{issue.project.name}</div>
-          <div className="card-status-indicators">
+      {isCompact ? (
+        <div className="card-compact-layout">
+          <div
+            className="card-priority-strip"
+            style={{ backgroundColor: priorityColor, position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', borderRadius: '4px 0 0 4px' }}
+            title={`Priority: ${priorityLabel}`}
+          />
+          <div className="card-compact-content" style={{ display: 'flex', alignItems: 'center', width: '100%', paddingLeft: '8px', paddingRight: '28px' }}>
             <span
               className="card-status-dot"
-              style={{ backgroundColor: statusDotColor }}
+              style={{ backgroundColor: statusDotColor, marginRight: '8px', flexShrink: 0 }}
               title={issue.status?.name || 'Unknown'}
             />
-            <span
-              className="card-priority-badge"
-              style={{ color: priorityColor, borderColor: `${priorityColor}44` }}
-              title={`Priority: ${priorityLabel}`}
-            >
-              {priorityLabel}
+            <span className="card-issue-id" style={{ marginRight: '8px', flexShrink: 0 }}>#{issue.id}</span>
+            <span className={`card-title ${isDone ? 'card-title-done' : ''}`} style={{ flex: 1, fontSize: '13px', margin: 0, paddingRight: '8px', wordBreak: 'break-word', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              {issue.subject}
             </span>
-          </div>
-        </div>
-
-        {/* Title */}
-        <div className={`card-title ${isDone ? 'card-title-done' : ''}`}>
-          {issue.subject}
-        </div>
-
-        {/* Due date overdue warning */}
-        {issue.due_date && new Date(issue.due_date) < new Date() && !isDone && (
-          <div className="card-due-overdue" title={`Due: ${issue.due_date}`}>
-            &#9888; {issue.due_date}
-          </div>
-        )}
-
-        {/* Progress bar at bottom of body */}
-        {doneRatio > 0 && !isDone && (
-          <div className="card-progress-bar-wrapper" title={`Progress: ${doneRatio}%`}>
-            <div className="card-progress-bar-fill" style={{ width: `${doneRatio}%` }} />
-          </div>
-        )}
-
-        {/* Footer: ID + subtask counter + assignee */}
-        <div className="card-footer">
-          <span className="card-issue-id">#{issue.id}</span>
-          {issue.children && issue.children.length > 0 && (() => {
-            const total = issue.children.length;
-            const done = issue.children.filter(c =>
-              c.status?.name?.toLowerCase().includes('closed') ||
-              c.status?.name?.toLowerCase().includes('done') ||
-              c.status?.name?.toLowerCase().includes('resolved')
-            ).length;
-            return (
-              <span className="card-subtask-counter" title={`Subtasks: ${done}/${total} done`}>
-                ↳ {done}/{total}
+            {assigneeInitial && (
+              <span
+                className="card-assignee-avatar"
+                style={{ backgroundColor: `hsl(${avatarHue}, 45%, 42%)`, width: '20px', height: '20px', fontSize: '10px', flexShrink: 0 }}
+                title={assigneeName}
+              >
+                {assigneeInitial}
               </span>
-            );
-          })()}
-          <div className="card-assignee">
-            {assigneeInitial ? (
-              <>
-                <span
-                  className="card-assignee-avatar"
-                  style={{ backgroundColor: `hsl(${avatarHue}, 45%, 42%)` }}
-                >
-                  {assigneeInitial}
-                </span>
-                <span className="card-assignee-name">{assigneeName}</span>
-              </>
-            ) : (
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Unassigned</span>
             )}
           </div>
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Left priority strip */}
+          <div
+            className="card-priority-strip"
+            style={{ backgroundColor: priorityColor }}
+            title={`Priority: ${priorityLabel}`}
+          />
+
+          <div className="card-body">
+            {/* Top row: project tag + status dot + priority badge */}
+            <div className="card-top-row">
+              <div className="card-project-tag">{issue.project.name}</div>
+              <div className="card-status-indicators">
+                <span
+                  className="card-status-dot"
+                  style={{ backgroundColor: statusDotColor }}
+                  title={issue.status?.name || 'Unknown'}
+                />
+                <span
+                  className="card-priority-badge"
+                  style={{ color: priorityColor, borderColor: `${priorityColor}44` }}
+                  title={`Priority: ${priorityLabel}`}
+                >
+                  {priorityLabel}
+                </span>
+              </div>
+            </div>
+
+            {/* Title */}
+            <div className={`card-title ${isDone ? 'card-title-done' : ''}`}>
+              {issue.subject}
+            </div>
+
+            {/* Due date overdue warning */}
+            {issue.due_date && new Date(issue.due_date) < new Date() && !isDone && (
+              <div className="card-due-overdue" title={`Due: ${issue.due_date}`} style={{ display: 'flex', alignItems: 'center' }}>
+                <AlertIcon /> {issue.due_date}
+              </div>
+            )}
+
+            {/* Progress bar at bottom of body */}
+            {doneRatio > 0 && !isDone && (
+              <div className="card-progress-bar-wrapper" title={`Progress: ${doneRatio}%`}>
+                <div className="card-progress-bar-fill" style={{ width: `${doneRatio}%` }} />
+              </div>
+            )}
+
+            {/* Footer: ID + subtask counter + assignee */}
+            <div className="card-footer">
+              <span className="card-issue-id">#{issue.id}</span>
+              {issue.children && issue.children.length > 0 && (() => {
+                const total = issue.children.length;
+                const done = issue.children.filter(c =>
+                  c.status?.name?.toLowerCase().includes('closed') ||
+                  c.status?.name?.toLowerCase().includes('done') ||
+                  c.status?.name?.toLowerCase().includes('resolved')
+                ).length;
+                return (
+                  <span className="card-subtask-counter" title={`Subtasks: ${done}/${total} done`}>
+                    ↳ {done}/{total}
+                  </span>
+                );
+              })()}
+              <div className="card-assignee">
+                {assigneeInitial ? (
+                  <>
+                    <span
+                      className="card-assignee-avatar"
+                      style={{ backgroundColor: `hsl(${avatarHue}, 45%, 42%)` }}
+                    >
+                      {assigneeInitial}
+                    </span>
+                    <span className="card-assignee-name">{assigneeName}</span>
+                  </>
+                ) : (
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Unassigned</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Quick actions on hover */}
       <div className="card-quick-actions">
@@ -170,7 +217,7 @@ export function IssueCard({ issue, onClick, isOverlay, isFocused }) {
           title="Open issue"
           onPointerDown={e => e.stopPropagation()}
         >
-          ···
+          <MoreHorizontalIcon />
         </button>
       </div>
     </div>

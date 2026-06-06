@@ -8,7 +8,7 @@ const HOTKEYS = [
       { keys: ['P'], description: 'Create new project' },
       { keys: ['R'], description: 'Refresh data' },
       { keys: ['Ctrl', 'K'], description: 'Open command palette' },
-      { keys: ['/'], description: 'Show keyboard shortcuts (any layout)' },
+      { keys: ['?'], description: 'Show keyboard shortcuts (any layout)' },
       { keys: ['Esc'], description: 'Close panel / cancel' },
     ],
   },
@@ -20,8 +20,10 @@ const HOTKEYS = [
       { keys: ['H', '←'], description: 'Move focus to previous column' },
       { keys: ['L', '→'], description: 'Move focus to next column' },
       { keys: ['Enter', 'Space'], description: 'Open focused card' },
-      { keys: ['V'], description: 'Toggle Kanban / List view' },
+      { keys: ['V'], description: 'Toggle Kanban / Swimlanes / List view' },
+      { keys: ['B'], description: 'Toggle Subtasks visibility' },
       { keys: ['F'], description: 'Focus search bar' },
+      { keys: ['T'], description: 'Toggle Dark/Light theme' },
     ],
   },
   {
@@ -101,7 +103,7 @@ export function HotkeysModal({ onClose }) {
         </div>
 
         <div className="hotkeys-modal-footer">
-          Press <kbd className="hotkey-kbd">/</kbd> or <kbd className="hotkey-kbd">Esc</kbd> to close
+          Press <kbd className="hotkey-kbd">?</kbd> or <kbd className="hotkey-kbd">Esc</kbd> to close
         </div>
       </div>
     </div>

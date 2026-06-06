@@ -1,4 +1,3 @@
-import React from 'react';
 
 const SearchIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -53,6 +52,20 @@ const RefreshIcon = () => (
   </svg>
 );
 
+const SubtasksIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 3h18v18H3zM9 9h8M9 15h8M3 9h6M3 15h6"/>
+  </svg>
+);
+
+const SwimlanesIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="3" y1="12" x2="21" y2="12" />
+    <rect x="3" y="4" width="4" height="6" rx="1" /><rect x="9" y="4" width="4" height="6" rx="1" />
+    <rect x="3" y="14" width="4" height="6" rx="1" /><rect x="15" y="14" width="4" height="6" rx="1" />
+  </svg>
+);
+
 export function AppHeader({
   activeProject,
   projects,
@@ -63,6 +76,8 @@ export function AppHeader({
   searchRef,
   filterUser,
   filterStatus,
+  showSubtasks,
+  onToggleSubtasks,
   onClearFilters,
   onCreateIssue,
   onRefresh,
@@ -70,6 +85,10 @@ export function AppHeader({
   theme,
   onToggleTheme,
   loading,
+  users,
+  statuses,
+  onFilterUserChange,
+  onFilterStatusChange,
 }) {
   const activeProjectName =
     activeProject === 'all'
@@ -79,79 +98,103 @@ export function AppHeader({
   const hasFilters = filterUser || filterStatus || searchQuery;
 
   return (
-    <header className="workspace-header">
-      {/* Left: breadcrumb */}
-      <div className="header-left">
-        <span className="header-breadcrumb" title={activeProjectName}>
-          {activeProjectName}
-        </span>
-      </div>
+    <>
+      <header className="workspace-header">
+        {/* Left: breadcrumb */}
+        <div className="header-left">
+          <span className="header-breadcrumb" title={activeProjectName}>
+            {activeProjectName}
+          </span>
+        </div>
 
-      {/* Center: search */}
-      <div className="header-center">
-        <div className="header-search-bar" data-tooltip="Search issues (F)">
-          <SearchIcon />
-          <input
-            ref={searchRef}
-            type="text"
-            className="search-input"
-            placeholder="Search issues..."
-            value={searchQuery}
-            onChange={e => onSearchChange(e.target.value)}
-          />
-          {searchQuery && (
-            <button className="clear-search-btn" onClick={() => onSearchChange('')} title="Clear search">
+        {/* Center: search */}
+        <div className="header-center">
+          <div className="header-search-bar" data-tooltip="Search issues (F)" data-tooltip-below>
+            <SearchIcon />
+            <input
+              ref={searchRef}
+              type="text"
+              className="search-input"
+              placeholder="Search issues..."
+              value={searchQuery}
+              onChange={e => onSearchChange(e.target.value)}
+            />
+            {searchQuery && (
+              <button className="clear-search-btn" onClick={() => onSearchChange('')} title="Clear search">
+                <XIcon />
+              </button>
+            )}
+          </div>
+
+          {hasFilters && (
+            <div
+              className="active-filters"
+              onClick={onClearFilters}
+              title="Clear all filters"
+            >
+              <span>Clear filters</span>
               <XIcon />
-            </button>
+            </div>
           )}
         </div>
 
-        {hasFilters && (
-          <div
-            className="active-filters"
-            onClick={onClearFilters}
-            title="Clear all filters"
-          >
-            <span>Clear filters</span>
-            <XIcon />
-          </div>
-        )}
-      </div>
-
-      {/* Right: actions */}
-      <div className="header-actions">
-        {/* View toggle */}
-        <div className="view-toggle">
-          <button
-            className={`view-btn ${view === 'kanban' ? 'active' : ''}`}
-            onClick={() => onSetView('kanban')}
-            data-tooltip="Kanban board (V)"
-          >
-            <KanbanIcon />
-            Kanban
-          </button>
-          <button
-            className={`view-btn ${view === 'list' ? 'active' : ''}`}
-            onClick={() => onSetView('list')}
-            data-tooltip="Issue list (V)"
-          >
-            <ListIcon />
+        {/* Right: actions */}
+        <div className="header-actions">
+          {/* View toggle */}
+          <div className="view-toggle">
+            <button
+              className={`view-btn ${view === 'kanban' ? 'active' : ''}`}
+              onClick={() => onSetView('kanban')}
+              data-tooltip="Kanban board (V)"
+              data-tooltip-below
+            >
+              <KanbanIcon />
+              Kanban
+            </button>
+            <button
+              className={`view-btn ${view === 'swimlanes' ? 'active' : ''}`}
+              onClick={() => onSetView('swimlanes')}
+              data-tooltip="Swimlanes board (V)"
+              data-tooltip-below
+            >
+              <SwimlanesIcon />
+              Swimlanes
+            </button>
+            <button
+              className={`view-btn ${view === 'list' ? 'active' : ''}`}
+              onClick={() => onSetView('list')}
+              data-tooltip="Issue list (V)"
+              data-tooltip-below
+            >
+              <ListIcon />
             List
           </button>
         </div>
+
+        {/* Subtasks toggle */}
+        <button
+          className={`btn btn-icon ${showSubtasks ? 'active' : ''}`}
+          onClick={onToggleSubtasks}
+          data-tooltip={showSubtasks ? 'Hide subtasks on board (B)' : 'Show subtasks on board (B)'}
+          data-tooltip-below
+          style={{ background: showSubtasks ? 'var(--bg-hover)' : 'transparent' }}
+        >
+          <SubtasksIcon />
+        </button>
 
         {/* Command palette */}
         <button
           className="btn btn-icon"
           onClick={onOpenCommandPalette}
           data-tooltip="Command palette (Ctrl+K)"
+          data-tooltip-below
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" />
           </svg>
         </button>
 
-        <button className="btn btn-primary" onClick={onCreateIssue} data-tooltip="Create issue (C)">
+        <button className="btn btn-primary" onClick={onCreateIssue} data-tooltip="Create issue (C)" data-tooltip-left data-tooltip-below>
           <PlusIcon />
           Create issue
         </button>
@@ -159,7 +202,9 @@ export function AppHeader({
         <button
           className="btn btn-icon"
           onClick={onToggleTheme}
-          data-tooltip={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          data-tooltip={theme === 'dark' ? 'Switch to light mode (T)' : 'Switch to dark mode (T)'}
+          data-tooltip-left
+          data-tooltip-below
         >
           {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
         </button>
@@ -168,6 +213,8 @@ export function AppHeader({
           className="btn btn-icon"
           onClick={onRefresh}
           data-tooltip="Refresh data (R)"
+          data-tooltip-left
+          data-tooltip-below
           disabled={loading}
           style={{ opacity: loading ? 0.5 : 1 }}
         >
@@ -175,5 +222,38 @@ export function AppHeader({
         </button>
       </div>
     </header>
+    <div className="workspace-filters-bar">
+      <div className="filters-container">
+        <select
+          className="filter-select"
+          value={filterUser || ''}
+          onChange={e => onFilterUserChange(e.target.value ? parseInt(e.target.value) : null)}
+          title="Filter by Assignee"
+        >
+          <option value="">Any Assignee</option>
+          <option value="me">&lt;&lt; me &gt;&gt;</option>
+          {users.map(u => (
+            <option key={u.id} value={u.id}>
+              {u.name || `${u.firstname} ${u.lastname}`.trim() || u.login}
+            </option>
+          ))}
+        </select>
+
+        <select
+          className="filter-select"
+          value={filterStatus || ''}
+          onChange={e => onFilterStatusChange(e.target.value)}
+          title="Filter by Status"
+        >
+          <option value="">Any Status</option>
+          {statuses.map(s => (
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  </>
   );
 }

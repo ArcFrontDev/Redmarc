@@ -1,4 +1,3 @@
-import React from 'react';
 import logoUrl from '../assets/logo.png';
 
 const PlusIcon = () => (
@@ -13,6 +12,14 @@ const FolderIcon = () => (
   </svg>
 );
 
+const HelpIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
+  </svg>
+);
+
 export function Sidebar({
   projects,
   activeProject,
@@ -20,9 +27,17 @@ export function Sidebar({
   onCreateProject,
   onDeleteProject,
   issues,
-  loading,
   onOpenHotkeys,
+  currentUser,
 }) {
+  const userInitials = currentUser 
+    ? `${currentUser.firstname?.[0] || ''}${currentUser.lastname?.[0] || ''}`.toUpperCase()
+    : 'RM';
+    
+  const userName = currentUser
+    ? `${currentUser.firstname} ${currentUser.lastname}`.trim()
+    : 'Redmine User';
+
   return (
     <aside className="app-sidebar">
       {/* Brand header */}
@@ -87,18 +102,18 @@ export function Sidebar({
         </div>
         <div className="sidebar-footer-row">
           <div className="user-profile">
-            <div className="user-avatar">RM</div>
+            <div className="user-avatar">{userInitials || '?'}</div>
             <div className="user-info">
-              <span className="user-name">Redmine User</span>
-              <span className="user-role">Connected</span>
+              <span className="user-name" title={userName}>{userName}</span>
+              <span className="user-role">{currentUser?.admin ? 'Admin' : 'Connected'}</span>
             </div>
           </div>
           <button
             className="hotkeys-trigger-btn"
             onClick={onOpenHotkeys}
-            data-tooltip="Keyboard shortcuts (/)"
+            data-tooltip="Keyboard shortcuts (?)"
           >
-            ?
+            <HelpIcon />
           </button>
         </div>
       </div>
