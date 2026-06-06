@@ -25,6 +25,8 @@ export function useKeyboard({
   onQuickStatus,
   onQuickEdit,
   onMoveCardToColumn,
+  onToggleSubtasks,
+  onToggleTheme,
 }) {
   const navigate = useCallback((direction) => {
     if (!groupedIssues) return;
@@ -136,6 +138,16 @@ export function useKeyboard({
         e.preventDefault(); onFocusSearch?.(); return;
       }
 
+      //B - toggle subtasks
+      if (e.code === 'KeyB' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+        e.preventDefault(); onToggleSubtasks?.(); return;
+      }
+
+      //T - toggle theme
+      if (e.code === 'KeyT' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+        e.preventDefault(); onToggleTheme?.(); return;
+      }
+
       //Card navigation: J or ArrowDown
       if ((e.code === 'KeyJ' || e.code === 'ArrowDown') && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
         e.preventDefault(); navigate('down'); return;
@@ -165,7 +177,10 @@ export function useKeyboard({
 
       //1-4 – move focused card to column 1,2,3,4 (instant column switch)
       if (focusedCard && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
-        const numMap = { 'Digit1': 0, 'Digit2': 1, 'Digit3': 2, 'Digit4': 3 };
+        const numMap = { 
+          'Digit1': 0, 'Digit2': 1, 'Digit3': 2, 'Digit4': 3,
+          'Numpad1': 0, 'Numpad2': 1, 'Numpad3': 2, 'Numpad4': 3 
+        };
         if (e.code in numMap) {
           e.preventDefault();
           const targetColKey = COL_ORDER[numMap[e.code]];
@@ -216,5 +231,6 @@ export function useKeyboard({
     activeProject, projects, isAnyModalOpen,
     focusedCard, setFocusedCard, navigate,
     onOpenFocusedCard, onQuickAssign, onQuickStatus, onQuickEdit, onMoveCardToColumn,
+    onToggleSubtasks, onToggleTheme
   ]);
 }
