@@ -199,7 +199,7 @@ const PRIORITIES = [
   { id: 5, label: 'Immediate' },
 ];
 
-export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStatus, onAssignUser, onIssueUpdated, initialFocus }) {
+export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStatus, onAssignUser, onIssueUpdated, initialFocus, onOpenIssue }) {
   const isOpen = Boolean(issue);
   const [fullIssue, setFullIssue] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -225,6 +225,12 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
 
   // Copy feedback
   const [copied, setCopied] = useState(false);
+
+  // Subtask inline create
+  const [isAddingSubtask, setIsAddingSubtask] = useState(false);
+  const [subtaskSubject, setSubtaskSubject] = useState('');
+  const [subtaskSaving, setSubtaskSaving] = useState(false);
+  const subtaskInputRef = useRef(null);
 
   const titleRef = useRef(null);
 
@@ -369,6 +375,31 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
       console.error('Failed to add comment:', err);
     } finally {
       setCommentSaving(false);
+    }
+  };
+
+  // Add subtask
+  const handleAddSubtask = async () => {
+    const subject = subtaskSubject.trim();
+    if (!subject) return;
+    setSubtaskSaving(true);
+    try {
+      await api.createIssue({
+        project_id: fullIssue?.project?.id || issue?.project?.id,
+        subject,
+        parent_issue_id: issue.id,
+        status_id: statuses[0]?.id,
+      });
+      setSubtaskSubject('');
+      setIsAddingSubtask(false);
+      // Reload full issue to refresh children list
+      const res = await api.getIssueDetails(issue.id);
+      setFullIssue(res.issue);
+      if (onIssueUpdated) onIssueUpdated();
+    } catch (err) {
+      console.error('Failed to create subtask:', err);
+    } finally {
+      setSubtaskSaving(false);
     }
   };
 
@@ -768,6 +799,117 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                     </select>
                   </div>
                 )}
+
+                {/* Parent Issue */}
+                {(fullIssue?.parent || displayIssue.parent) && (
+                  <div className="control-group">
+                    <label className="sidebar-label">Parent Issue</label>
+                    <button
+                      className="subtask-parent-link"
+                      onClick={() => {
+                        const parent = fullIssue?.parent || displayIssue.parent;
+                        if (onOpenIssue && parent?.id) onOpenIssue(parent.id);
+                      }}
+                      title="Navigate to parent issue"
+                    >
+                      <span className="subtask-parent-id">#{(fullIssue?.parent || displayIssue.parent)?.id}</span>
+                      <span className="subtask-parent-subject">{(fullIssue?.parent || displayIssue.parent)?.subject || 'Parent issue'}</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Subtasks */}
+                <div className="control-group subtasks-group">
+                  <div className="subtasks-header">
+                    <label className="sidebar-label">
+                      Subtasks
+                      {fullIssue?.children?.length > 0 && (
+                        <span className="subtasks-count-badge">{fullIssue.children.filter(c => c.status?.name?.toLowerCase().includes('closed') || c.status?.name?.toLowerCase().includes('done') || c.status?.name?.toLowerCase().includes('resolved')).length}/{fullIssue.children.length}</span>
+                      )}
+                    </label>
+                    <button
+                      className="subtask-add-btn"
+                      onClick={() => {
+                        setIsAddingSubtask(true);
+                        setTimeout(() => subtaskInputRef.current?.focus(), 60);
+                      }}
+                      title="Add subtask"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  {/* Subtask list */}
+                  {fullIssue?.children && fullIssue.children.length > 0 && (
+                    <div className="subtasks-list">
+                      {fullIssue.children.map(child => {
+                        const isDoneChild = child.done_ratio === 100
+                          || child.status?.name?.toLowerCase().includes('closed')
+                          || child.status?.name?.toLowerCase().includes('done')
+                          || child.status?.name?.toLowerCase().includes('resolved');
+                        return (
+                          <button
+                            key={child.id}
+                            className={`subtask-card ${isDoneChild ? 'is-done' : ''}`}
+                            onClick={() => onOpenIssue && onOpenIssue(child.id)}
+                            title={`Open #${child.id}`}
+                          >
+                            <div className="subtask-card-top">
+                              <span className="subtask-card-id">#{child.id}</span>
+                              {child.status?.name && (
+                                <span className="subtask-card-status">{child.status.name}</span>
+                              )}
+                            </div>
+                            <div className={`subtask-card-subject ${isDoneChild ? 'is-done-text' : ''}`}>
+                              {child.subject}
+                            </div>
+                            {child.assigned_to?.name && (
+                              <div className="subtask-card-assignee">{child.assigned_to.name}</div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Inline add subtask form */}
+                  {isAddingSubtask && (
+                    <div className="subtask-inline-form">
+                      <input
+                        ref={subtaskInputRef}
+                        type="text"
+                        className="details-input subtask-inline-input"
+                        placeholder="Subtask subject..."
+                        value={subtaskSubject}
+                        onChange={e => setSubtaskSubject(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') handleAddSubtask();
+                          if (e.key === 'Escape') { setIsAddingSubtask(false); setSubtaskSubject(''); }
+                        }}
+                      />
+                      <div className="subtask-inline-actions">
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={handleAddSubtask}
+                          disabled={!subtaskSubject.trim() || subtaskSaving}
+                        >
+                          {subtaskSaving ? '...' : 'Add'}
+                        </button>
+                        <button
+                          className="btn btn-sm"
+                          onClick={() => { setIsAddingSubtask(false); setSubtaskSubject(''); }}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Empty state */}
+                  {(!fullIssue?.children || fullIssue.children.length === 0) && !isAddingSubtask && (
+                    <div className="subtasks-empty">No subtasks yet.</div>
+                  )}
+                </div>
 
                 {/* Updated */}
                 <div className="control-group">

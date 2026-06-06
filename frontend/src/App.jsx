@@ -281,6 +281,12 @@ function App() {
           onAssignUser={handleAssignUser}
           onIssueUpdated={handleIssueUpdated}
           initialFocus={detailInitialFocus}
+          onOpenIssue={(issueId) => {
+            // Navigate to another issue by ID – look up in local list or create a stub
+            const found = issues.find(i => i.id === issueId);
+            setDetailInitialFocus(null);
+            setSelectedIssue(found || { id: issueId });
+          }}
         />
 
         {isCreateIssueOpen && (

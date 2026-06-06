@@ -61,7 +61,7 @@ export const api = {
   /**
    * Fetch full issue details including journals and attachments.
    */
-  getIssueDetails: (id) => request(`/issues/${id}.json?include=journals,attachments,watchers`),
+  getIssueDetails: (id) => request(`/issues/${id}.json?include=journals,attachments,watchers,children`),
 
   /**
    * Add a comment (note) to an issue.

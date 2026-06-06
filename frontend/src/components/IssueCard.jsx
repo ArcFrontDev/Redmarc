@@ -128,9 +128,22 @@ export function IssueCard({ issue, onClick, isOverlay, isFocused }) {
           </div>
         )}
 
-        {/* Footer: ID + assignee */}
+        {/* Footer: ID + subtask counter + assignee */}
         <div className="card-footer">
           <span className="card-issue-id">#{issue.id}</span>
+          {issue.children && issue.children.length > 0 && (() => {
+            const total = issue.children.length;
+            const done = issue.children.filter(c =>
+              c.status?.name?.toLowerCase().includes('closed') ||
+              c.status?.name?.toLowerCase().includes('done') ||
+              c.status?.name?.toLowerCase().includes('resolved')
+            ).length;
+            return (
+              <span className="card-subtask-counter" title={`Subtasks: ${done}/${total} done`}>
+                ↳ {done}/{total}
+              </span>
+            );
+          })()}
           <div className="card-assignee">
             {assigneeInitial ? (
               <>
