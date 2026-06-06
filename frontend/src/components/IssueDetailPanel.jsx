@@ -223,16 +223,17 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
   const [isWatching, setIsWatching] = useState(false);
   const [watchLoading, setWatchLoading] = useState(false);
 
-  // Copy feedback
+  //Copy feedback
   const [copied, setCopied] = useState(false);
 
-  // Subtask inline create
+  //Subtask inline create
   const [isAddingSubtask, setIsAddingSubtask] = useState(false);
   const [subtaskSubject, setSubtaskSubject] = useState('');
   const [subtaskSaving, setSubtaskSaving] = useState(false);
   const subtaskInputRef = useRef(null);
 
   const titleRef = useRef(null);
+  const statusSelectRef = useRef(null);
 
   // Load current user once
   useEffect(() => {
@@ -304,11 +305,21 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
     if (isEditingTitle && titleRef.current) titleRef.current.focus();
   }, [isEditingTitle]);
 
-  // Handle initialFocus from keyboard shortcut
+  //Handle initialFocus from keyboard shortcut
   useEffect(() => {
     if (!initialFocus || !isOpen) return;
     if (initialFocus === 'title') {
       setTimeout(() => setIsEditingTitle(true), 80);
+    }
+    if (initialFocus === 'status') {
+      //Focus and open the status select so user can change it immediately
+      setTimeout(() => {
+        if (statusSelectRef.current) {
+          statusSelectRef.current.focus();
+          //Trigger native picker open on supported browsers
+          try { statusSelectRef.current.showPicker?.(); } catch (_) {}
+        }
+      }, 120);
     }
   }, [initialFocus, isOpen]);
 
@@ -441,7 +452,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
       <div className={`issue-detail-drawer ${isOpen ? 'is-open' : ''}`}>
         {displayIssue && (
           <>
-            {/* ── Header ── */}
+            {/* Header */}
             <div className="drawer-header">
               <div className="drawer-header-meta">
                 <span className="details-issue-id">#{displayIssue.id}</span>
@@ -482,7 +493,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
             </div>
 
             <div className="drawer-body">
-              {/* ── Main scrollable content ── */}
+              {/* Main scrollable content */}
               <div className="drawer-content">
 
                 {/* Title */}
@@ -539,7 +550,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                   )}
                 </div>
 
-                {/* ── Attachments ── */}
+                {/* Attachments */}
                 {displayIssue.attachments && displayIssue.attachments.length > 0 && (
                   <div className="details-attachments">
                     <h4 className="section-heading" style={{ marginTop: '16px' }}>Attachments</h4>
@@ -582,7 +593,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                   </div>
                 )}
 
-                {/* ── Activity Journal ── */}
+                {/* Activity Journal */}
                 <div className="details-activity">
                   <h4 className="section-heading" style={{ marginTop: '24px', marginBottom: '12px' }}>Activity</h4>
 
@@ -651,6 +662,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                 <div className="control-group">
                   <label className="sidebar-label">Status</label>
                   <select
+                    ref={statusSelectRef}
                     className="details-select"
                     value={displayIssue.status?.id || ''}
                     onChange={e => onUpdateStatus(displayIssue.id, e.target.value)}

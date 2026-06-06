@@ -91,6 +91,19 @@ function App() {
     }
   }, [assignUser, users, selectedIssue]);
 
+  //Move focused card to a column by key (1-4 shortcut)
+  const handleMoveCardToColumn = useCallback((issueId, colKey) => {
+    const target = statuses.find(s => {
+      const n = s.name.toLowerCase();
+      if (colKey === 'todo')     return n.includes('new') || n.includes('open') || n.includes('backlog') || n.includes('to do') || n.includes('новая') || n.includes('открыта');
+      if (colKey === 'progress') return n.includes('progress') || n.includes('active') || n.includes('started') || n.includes('в работе');
+      if (colKey === 'review')   return n.includes('review') || n.includes('feedback') || n.includes('testing') || n.includes('resolved') || n.includes('на проверке');
+      if (colKey === 'done')     return n.includes('closed') || n.includes('done') || n.includes('completed') || n.includes('закрыта');
+      return false;
+    });
+    if (target) handleUpdateStatus(issueId, target.id);
+  }, [statuses, handleUpdateStatus]);
+
   // Filter issues
   const filteredIssues = useMemo(() => {
     return issues.filter(issue => {
@@ -151,14 +164,15 @@ function App() {
     activeProject,
     projects,
     isAnyModalOpen,
-    // Card navigation
+    //Card navigation
     groupedIssues,
     focusedCard,
     setFocusedCard,
-    onOpenFocusedCard:  () => openFocusedCard(null),
-    onQuickAssign:      () => openFocusedCard('assignee'),
-    onQuickStatus:      () => openFocusedCard('status'),
-    onQuickEdit:        () => openFocusedCard('title'),
+    onOpenFocusedCard:    () => openFocusedCard(null),
+    onQuickAssign:        () => openFocusedCard('assignee'),
+    onQuickStatus:        () => openFocusedCard('status'),
+    onQuickEdit:          () => openFocusedCard('title'),
+    onMoveCardToColumn:   handleMoveCardToColumn,
   });
 
   const handleCreateIssue = useCallback(async issueData => {

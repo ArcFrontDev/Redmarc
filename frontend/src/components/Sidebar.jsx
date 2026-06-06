@@ -96,7 +96,7 @@ export function Sidebar({
           <button
             className="hotkeys-trigger-btn"
             onClick={onOpenHotkeys}
-            title="Keyboard shortcuts (?)"
+            data-tooltip="Keyboard shortcuts (/)"
           >
             ?
           </button>

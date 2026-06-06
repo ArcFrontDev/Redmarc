@@ -8,7 +8,7 @@ const HOTKEYS = [
       { keys: ['P'], description: 'Create new project' },
       { keys: ['R'], description: 'Refresh data' },
       { keys: ['Ctrl', 'K'], description: 'Open command palette' },
-      { keys: ['?'], description: 'Show this help' },
+      { keys: ['/'], description: 'Show keyboard shortcuts (any layout)' },
       { keys: ['Esc'], description: 'Close panel / cancel' },
     ],
   },
@@ -27,6 +27,10 @@ const HOTKEYS = [
   {
     section: 'Quick Actions (on focused card)',
     items: [
+      { keys: ['1'], description: 'Move card to column 1 – To Do' },
+      { keys: ['2'], description: 'Move card to column 2 – In Progress' },
+      { keys: ['3'], description: 'Move card to column 3 – Review' },
+      { keys: ['4'], description: 'Move card to column 4 – Done' },
       { keys: ['A'], description: 'Quick assign – open detail & focus assignee' },
       { keys: ['S'], description: 'Quick status – open detail & focus status' },
       { keys: ['E'], description: 'Edit title – open detail in title edit mode' },
@@ -38,20 +42,20 @@ const HOTKEYS = [
       { keys: ['Del'], description: 'Delete active project (confirm required)' },
     ],
   },
-  {
-    section: 'Drag & Drop',
-    items: [
-      { keys: ['Space'], description: 'Pick up / drop card (keyboard DnD)' },
-      { keys: ['← →'], description: 'Move card between columns' },
-      { keys: ['↑ ↓'], description: 'Reorder within column' },
-    ],
-  },
 ];
 
 export function HotkeysModal({ onClose }) {
   useEffect(() => {
     const handler = e => {
-      if (e.key === 'Escape' || e.key === '?') onClose();
+      //Close on Escape or the same help key (physical Slash/Period)
+      if (
+        e.key === 'Escape' ||
+        e.code === 'Slash' ||
+        e.code === 'Period' ||
+        e.key === '?' ||
+        e.key === '/' ||
+        e.key === '.'
+      ) onClose();
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
@@ -97,7 +101,7 @@ export function HotkeysModal({ onClose }) {
         </div>
 
         <div className="hotkeys-modal-footer">
-          Press <kbd className="hotkey-kbd">?</kbd> or <kbd className="hotkey-kbd">Esc</kbd> to close
+          Press <kbd className="hotkey-kbd">/</kbd> or <kbd className="hotkey-kbd">Esc</kbd> to close
         </div>
       </div>
     </div>

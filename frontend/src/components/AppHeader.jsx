@@ -89,13 +89,13 @@ export function AppHeader({
 
       {/* Center: search */}
       <div className="header-center">
-        <div className="header-search-bar">
+        <div className="header-search-bar" data-tooltip="Search issues (F)">
           <SearchIcon />
           <input
             ref={searchRef}
             type="text"
             className="search-input"
-            placeholder="Search issues... (F)"
+            placeholder="Search issues..."
             value={searchQuery}
             onChange={e => onSearchChange(e.target.value)}
           />
@@ -125,7 +125,7 @@ export function AppHeader({
           <button
             className={`view-btn ${view === 'kanban' ? 'active' : ''}`}
             onClick={() => onSetView('kanban')}
-            title="Kanban board"
+            data-tooltip="Kanban board (V)"
           >
             <KanbanIcon />
             Kanban
@@ -133,14 +133,25 @@ export function AppHeader({
           <button
             className={`view-btn ${view === 'list' ? 'active' : ''}`}
             onClick={() => onSetView('list')}
-            title="Issue list"
+            data-tooltip="Issue list (V)"
           >
             <ListIcon />
             List
           </button>
         </div>
 
-        <button className="btn btn-primary" onClick={onCreateIssue}>
+        {/* Command palette */}
+        <button
+          className="btn btn-icon"
+          onClick={onOpenCommandPalette}
+          data-tooltip="Command palette (Ctrl+K)"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19" />
+          </svg>
+        </button>
+
+        <button className="btn btn-primary" onClick={onCreateIssue} data-tooltip="Create issue (C)">
           <PlusIcon />
           Create issue
         </button>
@@ -148,7 +159,7 @@ export function AppHeader({
         <button
           className="btn btn-icon"
           onClick={onToggleTheme}
-          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          data-tooltip={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         >
           {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
         </button>
@@ -156,7 +167,7 @@ export function AppHeader({
         <button
           className="btn btn-icon"
           onClick={onRefresh}
-          title="Refresh data (R)"
+          data-tooltip="Refresh data (R)"
           disabled={loading}
           style={{ opacity: loading ? 0.5 : 1 }}
         >
