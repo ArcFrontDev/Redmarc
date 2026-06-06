@@ -4,7 +4,7 @@ Redmine::Plugin.register :redmarc do
   name 'Redmarc Frontend Plugin'
   author 'ArcFrontDev'
   description 'Modern React frontend for Redmine'
-  version '0.0.1'
+  version '0.5.0'
   url 'https://github.com/ArcFrontDev/Redmarc'
   author_url 'https://github.com/ArcFrontDev'
 
