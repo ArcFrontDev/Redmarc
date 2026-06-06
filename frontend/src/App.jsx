@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import './App.css';
 
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -13,19 +13,20 @@ import { DeleteConfirmModal } from './components/DeleteConfirmModal';
 import { ContextMenu } from './components/ContextMenu';
 import { HotkeysModal } from './components/HotkeysModal';
 import CommandPalette from './components/CommandPalette';
+import { DynamicTooltip } from './components/DynamicTooltip';
 
 import { useAppData } from './hooks/useAppData';
 import { useTheme } from './hooks/useTheme';
 import { useKeyboard } from './hooks/useKeyboard';
 import { useDragAndDrop } from './hooks/useDragAndDrop';
-import { groupIssuesByColumn } from './utils/statusMapping';
+import { groupIssuesByColumn, getColumnForStatus } from './utils/statusMapping';
 
 function App() {
   const { theme, setTheme, toggleTheme } = useTheme();
   const searchRef = useRef(null);
 
   const {
-    issues, projects, statuses, users,
+    issues, projects, statuses, users, currentUser,
     loading, error,
     loadData,
     updateIssueStatus,
@@ -33,16 +34,20 @@ function App() {
     createIssue,
     createProject,
     deleteProject,
+    loadIssues,
+    bulkUpdateIssues,
   } = useAppData();
 
   // UI state
   const [view, setView]                   = useState('kanban');
+  const [toast, setToast]                 = useState(null);
   const [activeProject, setActiveProject] = useState('all');
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [detailInitialFocus, setDetailInitialFocus] = useState(null);
   const [searchQuery, setSearchQuery]     = useState('');
   const [filterUser, setFilterUser]       = useState(null);
   const [filterStatus, setFilterStatus]   = useState(null);
+  const [showSubtasks, setShowSubtasks]   = useState(true);
 
   // Keyboard card focus
   const [focusedCard, setFocusedCard]     = useState(null);
@@ -72,13 +77,22 @@ function App() {
     openDeleteConfirm(project);
   }, [openDeleteConfirm]);
 
-  const handleUpdateStatus = useCallback((issueId, statusId) => {
-    updateIssueStatus(issueId, statusId, statuses).catch(() => {});
-    if (selectedIssue?.id === issueId) {
-      const s = statuses.find(st => st.id === parseInt(statusId));
-      if (s) setSelectedIssue(prev => ({ ...prev, status: { id: s.id, name: s.name } }));
+  const showToast = useCallback((message, type = 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  }, []);
+
+  const handleUpdateStatus = useCallback(async (issueId, statusId) => {
+    try {
+      await updateIssueStatus(issueId, statusId, statuses);
+      if (selectedIssue?.id === issueId) {
+        const s = statuses.find(st => st.id === parseInt(statusId));
+        if (s) setSelectedIssue(prev => ({ ...prev, status: { id: s.id, name: s.name } }));
+      }
+    } catch {
+      showToast("Ошибка: недостаточно прав для смены статуса (Workflow restrictions)", "error");
     }
-  }, [updateIssueStatus, statuses, selectedIssue]);
+  }, [updateIssueStatus, statuses, selectedIssue, showToast]);
 
   const handleAssignUser = useCallback((issueId, userId) => {
     assignUser(issueId, userId, users).catch(() => {});
@@ -93,33 +107,27 @@ function App() {
 
   //Move focused card to a column by key (1-4 shortcut)
   const handleMoveCardToColumn = useCallback((issueId, colKey) => {
-    const target = statuses.find(s => {
-      const n = s.name.toLowerCase();
-      if (colKey === 'todo')     return n.includes('new') || n.includes('open') || n.includes('backlog') || n.includes('to do') || n.includes('новая') || n.includes('открыта');
-      if (colKey === 'progress') return n.includes('progress') || n.includes('active') || n.includes('started') || n.includes('в работе');
-      if (colKey === 'review')   return n.includes('review') || n.includes('feedback') || n.includes('testing') || n.includes('resolved') || n.includes('на проверке');
-      if (colKey === 'done')     return n.includes('closed') || n.includes('done') || n.includes('completed') || n.includes('закрыта');
-      return false;
-    });
+    const target = statuses.find(s => getColumnForStatus(s.name) === colKey);
     if (target) handleUpdateStatus(issueId, target.id);
   }, [statuses, handleUpdateStatus]);
 
-  // Filter issues
+  // Filter issues (Local fallback for fast searching)
   const filteredIssues = useMemo(() => {
     return issues.filter(issue => {
-      const matchesProject =
-        activeProject === 'all' || issue.project.id === parseInt(activeProject);
       const q = searchQuery.trim().toLowerCase();
       const matchesSearch =
         !q ||
         issue.subject.toLowerCase().includes(q) ||
         (issue.description && issue.description.toLowerCase().includes(q)) ||
         `#${issue.id}`.includes(q);
-      const matchesUser   = !filterUser   || issue.assigned_to?.id === filterUser;
-      const matchesStatus = !filterStatus || issue.status?.id === filterStatus;
-      return matchesProject && matchesSearch && matchesUser && matchesStatus;
+        
+      const parentId = issue.parent?.id || issue.parent_id;
+      const isSubtask = !!parentId;
+      const matchesSubtask = showSubtasks || !isSubtask;
+
+      return matchesSearch && matchesSubtask;
     });
-  }, [issues, activeProject, searchQuery, filterUser, filterStatus]);
+  }, [issues, searchQuery, showSubtasks]);
 
   // Base grouped (no sort order)
   const baseGrouped = useMemo(
@@ -151,14 +159,30 @@ function App() {
     }
   }, [focusedCard, groupedIssues]);
 
+  // Server-side filtering
+  useEffect(() => {
+    const params = {};
+    if (activeProject !== 'all') params.project_id = activeProject;
+    if (filterUser) params.assigned_to_id = filterUser;
+    if (filterStatus) params.status_id = filterStatus;
+    
+    loadIssues(params);
+  }, [activeProject, filterUser, filterStatus, loadIssues]);
+
   useKeyboard({
     onCreateIssue:          () => setIsCreateIssueOpen(true),
     onCreateProject:        () => setIsCreateProjectOpen(true),
-    onRefresh:              loadData,
+    onRefresh:              () => {
+      const params = {};
+      if (activeProject !== 'all') params.project_id = activeProject;
+      if (filterUser) params.assigned_to_id = filterUser;
+      if (filterStatus) params.status_id = filterStatus;
+      loadIssues(params);
+    },
     onToggleCommandPalette: () => setIsCommandOpen(o => !o),
     onDeleteActiveProject:  handleDeleteActiveProject,
     onCloseAll:             closeAll,
-    onToggleView:           () => setView(v => v === 'kanban' ? 'list' : 'kanban'),
+    onToggleView:           () => setView(v => v === 'swimlanes' ? 'kanban' : v === 'kanban' ? 'list' : 'swimlanes'),
     onFocusSearch:          () => searchRef.current?.focus(),
     onOpenHotkeys:          () => setIsHotkeysOpen(o => !o),
     activeProject,
@@ -173,6 +197,8 @@ function App() {
     onQuickStatus:        () => openFocusedCard('status'),
     onQuickEdit:          () => openFocusedCard('title'),
     onMoveCardToColumn:   handleMoveCardToColumn,
+    onToggleSubtasks:     () => setShowSubtasks(prev => !prev),
+    onToggleTheme:        toggleTheme,
   });
 
   const handleCreateIssue = useCallback(async issueData => {
@@ -209,6 +235,7 @@ function App() {
           }}
           issues={issues}
           loading={loading}
+          currentUser={currentUser}
           onOpenHotkeys={() => setIsHotkeysOpen(true)}
         />
 
@@ -223,13 +250,25 @@ function App() {
             searchRef={searchRef}
             filterUser={filterUser}
             filterStatus={filterStatus}
+            showSubtasks={showSubtasks}
+            onToggleSubtasks={() => setShowSubtasks(!showSubtasks)}
             onClearFilters={() => { setFilterUser(null); setFilterStatus(null); setSearchQuery(''); }}
             onCreateIssue={() => setIsCreateIssueOpen(true)}
-            onRefresh={loadData}
+            onRefresh={() => {
+              const params = {};
+              if (activeProject !== 'all') params.project_id = activeProject;
+              if (filterUser) params.assigned_to_id = filterUser;
+              if (filterStatus) params.status_id = filterStatus;
+              loadIssues(params);
+            }}
             onOpenCommandPalette={() => setIsCommandOpen(true)}
             theme={theme}
             onToggleTheme={toggleTheme}
             loading={loading}
+            users={users}
+            statuses={statuses}
+            onFilterUserChange={setFilterUser}
+            onFilterStatusChange={setFilterStatus}
           />
 
           {error && (
@@ -250,13 +289,14 @@ function App() {
             </div>
           )}
 
-          {!loading && !error && view === 'kanban' && (
+          {!loading && !error && (view === 'kanban' || view === 'swimlanes') && (
             <KanbanBoard
               groupedIssues={groupedIssues}
               onIssueClick={issue => { setDetailInitialFocus(null); setSelectedIssue(issue); }}
               onAddIssue={() => setIsCreateIssueOpen(true)}
               onDragEnd={handleDragEnd}
               focusedCardId={focusedCard?.issueId || null}
+              isSwimlaneView={view === 'swimlanes'}
             />
           )}
 
@@ -264,6 +304,9 @@ function App() {
             <ListView
               issues={filteredIssues}
               onIssueClick={issue => { setDetailInitialFocus(null); setSelectedIssue(issue); }}
+              users={users}
+              statuses={statuses}
+              onBulkUpdate={bulkUpdateIssues}
             />
           )}
 
@@ -282,6 +325,15 @@ function App() {
               onGlobalFilterStatus={setFilterStatus}
               onOpenCreateTask={setIsCreateIssueOpen}
               onToggleTheme={setTheme}
+              onToggleView={() => setView(v => v === 'swimlanes' ? 'kanban' : v === 'kanban' ? 'list' : 'swimlanes')}
+              onToggleSubtasks={() => setShowSubtasks(prev => !prev)}
+              onRefresh={() => {
+                const params = {};
+                if (activeProject !== 'all') params.project_id = activeProject;
+                if (filterUser) params.assigned_to_id = filterUser;
+                if (filterStatus) params.status_id = filterStatus;
+                loadIssues(params);
+              }}
             />
           )}
         </main>
@@ -343,6 +395,14 @@ function App() {
             onClose={() => setContextMenu({ visible: false, x: 0, y: 0, project: null })}
           />
         )}
+
+        {toast && (
+          <div className={`toast-notification toast-${toast.type}`}>
+            {toast.type === 'error' ? '⚠️ ' : ''}{toast.message}
+          </div>
+        )}
+
+        <DynamicTooltip />
       </div>
     </ErrorBoundary>
   );

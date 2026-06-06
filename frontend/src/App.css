@@ -21,6 +21,8 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  position: relative;
+  z-index: 210;
 }
 
 .brand-header {
@@ -276,6 +278,8 @@ body.light-theme .nav-item-count {
   background: var(--bg-sidebar);
   flex-shrink: 0;
   box-shadow: 0 1px 0 rgba(0,0,0, 0.12);
+  position: relative;
+  z-index: 200;
 }
 
 .header-left {
@@ -2057,48 +2061,246 @@ body.light-theme .textile-body .textile-code {
   flex-shrink: 0;
 }
 
-/* ==========================================================================
-   Micro-tooltip system ([data-tooltip] attribute)
-   Usage: <button data-tooltip="Create issue (C)">
-   ========================================================================== */
-[data-tooltip] {
-  position: relative;
+.header-filters {
+  display: flex;
+  gap: 8px;
+  margin-left: 12px;
+}
+.filter-select {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 13px;
+  outline: none;
+}
+.filter-select:hover {
+  border-color: var(--text-secondary);
+}
+.filter-select:focus {
+  border-color: var(--accent);
+  color: var(--text-primary);
 }
 
-[data-tooltip]::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: calc(100% + 7px);
+
+.swimlane-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.swimlane-global-header {
+  display: flex;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border-subtle);
+}
+
+.swimlane-header-placeholder {
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.swimlane-header-columns {
+  display: flex;
+  flex: 1;
+  gap: 12px;
+}
+
+.swimlane-global-col-header {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.kanban-board.swimlane-mode {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: auto;
+  height: 100%;
+  padding-right: 8px;
+}
+
+.swimlane-container {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 12px 0;
+}
+
+.swimlane-header {
+  width: 200px;
+  flex-shrink: 0;
+  padding-right: 16px;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 4px;
+}
+
+.swimlane-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.swimlane-columns {
+  display: flex;
+  flex: 1;
+  gap: 12px;
+  height: 200px;
+}
+
+.swimlane-columns .kanban-column {
+  background: transparent;
+  border: 1px dashed transparent;
+  padding: 0;
+  min-width: 200px;
+}
+
+.swimlane-columns .kanban-column.is-drag-over {
+  border-color: var(--primary-color);
+  background: rgba(88, 101, 242, 0.05);
+}
+
+.card-compact-layout {
+  display: flex;
+  position: relative;
+  min-height: 32px;
+  height: auto;
+  padding: 4px 0;
+  width: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  cursor: grab;
+  transition: all 0.2s ease;
+}
+
+.card-compact-layout:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+
+.bulk-action-bar {
+  position: fixed;
+  bottom: 24px;
   left: 50%;
-  transform: translateX(-50%) scale(0.9);
+  transform: translateX(-50%);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+.bulk-info {
+  font-size: 14px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bulk-count {
+  background: var(--accent);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 12px;
+}
+.bulk-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.bulk-select {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  outline: none;
+}
+.bulk-btn-outline {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 16px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.bulk-btn-outline:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+.col-checkbox {
+  width: 40px;
+  text-align: center;
+}
+.issues-table .table-row.selected {
+  background: var(--bg-hover);
+}
+
+
+.swimlane-wrapper { min-width: 1000px; }
+.swimlane-container { min-width: 1000px; width: 100%; }
+
+
+.workspace-filters-bar { padding: 8px 20px; border-bottom: 1px solid var(--border-subtle); background: var(--bg-sidebar); }
+.filters-container { display: flex; gap: 8px; align-items: center; }
+
+
+.swimlane-global-col-header { gap: 6px; }
+
+
+.header-search-bar svg { color: var(--text-secondary); flex-shrink: 0; }
+
+
+.toast-notification {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
   background: var(--bg-card);
   color: var(--text-primary);
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
-  padding: 4px 9px;
-  font-size: 11px;
-  font-weight: 500;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.12s ease, transform 0.12s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   z-index: 9999;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slideUp 0.3s ease-out;
+  border-left: 4px solid var(--accent);
+}
+.toast-error {
+  border-left-color: #ef4444;
+  background: #fef2f2;
+  color: #991b1b;
+}
+[data-theme='dark'] .toast-error {
+  background: #450a0a;
+  color: #fca5a5;
+}
+@keyframes slideUp {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
 }
 
-[data-tooltip]:hover::after {
-  opacity: 1;
-  transform: translateX(-50%) scale(1);
-}
-
-/* Tooltip below variant */
-[data-tooltip-below]::after {
-  bottom: auto;
-  top: calc(100% + 7px);
-}
-
-/* Make the kbd-style shortcut hint inside tooltip visually distinct */
-[data-tooltip]::after {
-  font-family: var(--font-main);
-  letter-spacing: 0;
-}
