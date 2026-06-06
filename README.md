@@ -67,7 +67,7 @@ Want to see Redmarc in action without configuring Ruby, Rails, or PostgreSQL on 
 ### Option 1: 1-Click Cloud Sandbox (No installation required)
 Just click and wait for your environment to boot!
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/ArcFrontDev/Redmarc)
-[![Build with Daytona](https://pkg.daytona.io/badge/badge.svg)](https://daytona.io/)
+[![Build with Daytona](https://img.shields.io/badge/Build_with-Daytona-1D4ED8?style=flat)](https://daytona.io/)
 
 ### Option 2: Local Docker Sandbox (Requires Docker)
 If you have Docker and Docker Compose installed, simply run this command in the root of the repository:
