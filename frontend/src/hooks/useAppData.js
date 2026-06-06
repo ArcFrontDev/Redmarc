@@ -8,6 +8,7 @@ import { api } from '../utils/api';
  */
 async function fetchAllIssues(params = {}) {
   const BATCH = 100;
+  const MAX_ISSUES = 1000; // Hard cap for performance
   let offset = 0;
   let all = [];
   let total = null;
@@ -18,6 +19,7 @@ async function fetchAllIssues(params = {}) {
     all = all.concat(items);
     if (total === null) total = data.total_count ?? items.length;
     offset += BATCH;
+    if (all.length >= MAX_ISSUES) break;
   } while (offset < total);
 
   return all;
@@ -28,36 +30,69 @@ export function useAppData() {
   const [projects, setProjects] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const [users, setUsers] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadData = useCallback(async () => {
+  const loadIssues = useCallback(async (params = {}) => {
     try {
       setLoading(true);
-      setError(null);
-      const [projectsData, statusesData, allIssues] = await Promise.all([
-        api.getProjects(),
-        api.getStatuses(),
-        fetchAllIssues({ status_id: '*' }),
-      ]);
-      setProjects(projectsData.projects || []);
-      setStatuses(statusesData.issue_statuses || []);
+      const allIssuesRaw = await fetchAllIssues({ status_id: '*', ...params });
+      
+      const allIssues = [...allIssuesRaw];
+      const issuesMap = {};
+      allIssues.forEach(issue => {
+        issue.children = [];
+        issuesMap[issue.id] = issue;
+      });
+
+      allIssues.forEach(issue => {
+        const parentId = issue.parent?.id || issue.parent_id;
+        if (parentId && issuesMap[parentId]) {
+          issuesMap[parentId].children.push(issue);
+        }
+      });
+
       setIssues(allIssues);
-      try {
-        const usersData = await api.getUsers();
-        setUsers(usersData.users || []);
-      } catch {
-        // Non-admin users cannot list all users – expected
-        setUsers([]);
-      }
     } catch (err) {
-      console.error('Failed to load data:', err);
-      setError('Unable to connect to Redmine. Make sure you are logged in and the plugin is installed correctly.');
+      console.error('Failed to load issues:', err);
+      setError('Unable to fetch issues.');
     } finally {
       setLoading(false);
     }
   }, []);
 
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const [projectsData, statusesData, currentUserData] = await Promise.all([
+        api.getProjects(),
+        api.getStatuses(),
+        api.getCurrentUser().catch(() => ({ user: null }))
+      ]);
+      setProjects(projectsData.projects || []);
+      setStatuses(statusesData.issue_statuses || []);
+      if (currentUserData.user) {
+        setCurrentUser(currentUserData.user);
+      }
+      
+      await loadIssues();
+
+      try {
+        const usersData = await api.getUsers();
+        setUsers(usersData.users || []);
+      } catch {
+        setUsers([]);
+      }
+    } catch (err) {
+      console.error('Failed to load data:', err);
+      setError('Unable to connect to Redmine. Make sure you are logged in and the plugin is installed correctly.');
+      setLoading(false);
+    }
+  }, [loadIssues]);
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { loadData(); }, [loadData]);
 
   const updateIssueStatus = useCallback(async (issueId, newStatusId, statuses) => {
@@ -92,18 +127,61 @@ export function useAppData() {
     }
   }, [issues]);
 
+  const bulkUpdateIssues = useCallback(async (issueIds, updates) => {
+    try {
+      setLoading(true);
+      const promises = issueIds.map(id => api.updateIssue(id, updates));
+      await Promise.all(promises);
+      await loadIssues(); // refresh
+    } catch (err) {
+      console.error('Failed bulk update:', err);
+      setError('Failed to update some issues.');
+    } finally {
+      setLoading(false);
+    }
+  }, [loadIssues]);
+
   const createIssue = useCallback(async (issueData) => {
     await api.createIssue(issueData);
     const allIssues = await fetchAllIssues({ status_id: '*' });
+    
+    const issuesMap = {};
+    allIssues.forEach(issue => {
+      issue.children = [];
+      issuesMap[issue.id] = issue;
+    });
+
+    allIssues.forEach(issue => {
+      const parentId = issue.parent?.id || issue.parent_id;
+      if (parentId && issuesMap[parentId]) {
+        issuesMap[parentId].children.push(issue);
+      }
+    });
+
     setIssues(allIssues);
   }, []);
 
   const createProject = useCallback(async (projectData) => {
     await api.createProject(projectData);
-    const [pData, allIssues] = await Promise.all([
+    const [pData, allIssuesRaw] = await Promise.all([
       api.getProjects(),
       fetchAllIssues({ status_id: '*' }),
     ]);
+    
+    const allIssues = [...allIssuesRaw];
+    const issuesMap = {};
+    allIssues.forEach(issue => {
+      issue.children = [];
+      issuesMap[issue.id] = issue;
+    });
+
+    allIssues.forEach(issue => {
+      const parentId = issue.parent?.id || issue.parent_id;
+      if (parentId && issuesMap[parentId]) {
+        issuesMap[parentId].children.push(issue);
+      }
+    });
+
     setProjects(pData.projects || []);
     setIssues(allIssues);
   }, []);
@@ -111,10 +189,25 @@ export function useAppData() {
   const deleteProject = useCallback(async (projectId, activeProject, setActiveProject) => {
     await api.deleteProject(projectId);
     if (activeProject === String(projectId)) setActiveProject('all');
-    const [pData, allIssues] = await Promise.all([
+    const [pData, allIssuesRaw] = await Promise.all([
       api.getProjects(),
       fetchAllIssues({ status_id: '*' }),
     ]);
+    
+    const allIssues = [...allIssuesRaw];
+    const issuesMap = {};
+    allIssues.forEach(issue => {
+      issue.children = [];
+      issuesMap[issue.id] = issue;
+    });
+
+    allIssues.forEach(issue => {
+      const parentId = issue.parent?.id || issue.parent_id;
+      if (parentId && issuesMap[parentId]) {
+        issuesMap[parentId].children.push(issue);
+      }
+    });
+
     setProjects(pData.projects || []);
     setIssues(allIssues);
   }, []);
@@ -125,14 +218,17 @@ export function useAppData() {
 
   return {
     issues, setIssues,
-    projects, setProjects,
+    projects,
     statuses,
     users,
+    currentUser,
     loading, setLoading,
     error,
     loadData,
+    loadIssues,
     updateIssueStatus,
     assignUser,
+    bulkUpdateIssues,
     createIssue,
     createProject,
     deleteProject,

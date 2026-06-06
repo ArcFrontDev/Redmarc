@@ -36,9 +36,11 @@ export const api = {
   getIssues: (params = {}) => {
     const query = new URLSearchParams();
     if (!params.include) {
-      params.include = 'attachments';
-    } else if (!params.include.includes('attachments')) {
-      params.include += ',attachments';
+      params.include = 'attachments,relations,children';
+    } else {
+      if (!params.include.includes('attachments')) params.include += ',attachments';
+      if (!params.include.includes('relations')) params.include += ',relations';
+      if (!params.include.includes('children')) params.include += ',children';
     }
     if (!params.limit) params.limit = 100;
     if (params.offset === undefined) params.offset = 0;

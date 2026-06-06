@@ -16,6 +16,9 @@ export default function CommandPalette({
   onGlobalFilterStatus,
   onOpenCreateTask,
   onToggleTheme,
+  onToggleView,
+  onToggleSubtasks,
+  onRefresh,
 }) {
   const [search, setSearch] = useState('');
 
@@ -33,6 +36,7 @@ export default function CommandPalette({
 
   // Clear search on close
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!open) setSearch('');
   }, [open]);
 
@@ -73,6 +77,9 @@ export default function CommandPalette({
     if (action === 'create') onOpenCreateTask(true);
     else if (action === 'theme_dark') onToggleTheme('dark');
     else if (action === 'theme_light') onToggleTheme('light');
+    else if (action === 'toggle_view') onToggleView();
+    else if (action === 'toggle_subtasks') onToggleSubtasks();
+    else if (action === 'refresh') onRefresh();
     setOpen(false);
   };
 
@@ -95,8 +102,10 @@ export default function CommandPalette({
       label="Command Menu"
       className="cmdk-dialog"
       filter={(value, search) => {
-        // Custom filter disabled – we handle filtering ourselves
-        return 1;
+        if (!search) return 1;
+        const cleanSearch = search.replace(/^[>@]/, '').trim().toLowerCase();
+        if (value.toLowerCase().includes(cleanSearch)) return 1;
+        return 0;
       }}
     >
       <div className="cmdk-overlay" onClick={() => setOpen(false)} />
@@ -106,7 +115,7 @@ export default function CommandPalette({
             autoFocus
             value={search}
             onValueChange={setSearch}
-            placeholder="Search issues, projects or type a command (>, @)..."
+            placeholder="Search issues... (Type > for commands, @ for users)"
             className="cmdk-input"
           />
         </div>
@@ -141,6 +150,30 @@ export default function CommandPalette({
                 >
                   <span className="cmdk-action-icon">☀️</span>
                   Switch to Light mode
+                </Command.Item>
+                <Command.Item
+                  onSelect={() => handleGlobalAction('toggle_view')}
+                  className="cmdk-item"
+                  value="toggle view kanban list swimlanes"
+                >
+                  <span className="cmdk-action-icon">▤</span>
+                  Toggle View (Kanban / Swimlanes / List)
+                </Command.Item>
+                <Command.Item
+                  onSelect={() => handleGlobalAction('toggle_subtasks')}
+                  className="cmdk-item"
+                  value="toggle subtasks"
+                >
+                  <span className="cmdk-action-icon">⑆</span>
+                  Toggle Subtasks visibility
+                </Command.Item>
+                <Command.Item
+                  onSelect={() => handleGlobalAction('refresh')}
+                  className="cmdk-item"
+                  value="refresh reload data"
+                >
+                  <span className="cmdk-action-icon">↻</span>
+                  Refresh Data
                 </Command.Item>
               </Command.Group>
 
@@ -209,6 +242,27 @@ export default function CommandPalette({
                     value="light mode"
                   >
                     Light mode
+                  </Command.Item>
+                  <Command.Item
+                    onSelect={() => handleGlobalAction('toggle_view')}
+                    className="cmdk-item"
+                    value="toggle view"
+                  >
+                    Toggle View
+                  </Command.Item>
+                  <Command.Item
+                    onSelect={() => handleGlobalAction('toggle_subtasks')}
+                    className="cmdk-item"
+                    value="toggle subtasks"
+                  >
+                    Toggle Subtasks
+                  </Command.Item>
+                  <Command.Item
+                    onSelect={() => handleGlobalAction('refresh')}
+                    className="cmdk-item"
+                    value="refresh"
+                  >
+                    Refresh Data
                   </Command.Item>
                   <div className="cmdk-separator" />
                 </>
