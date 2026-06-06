@@ -8,6 +8,9 @@ Redmine::Plugin.register :arcfront do
   url 'https://github.com/ArcFrontDev/Redmarc'
   author_url 'https://github.com/ArcFrontDev'
   
-  # Register the menu item for the plugin
-  menu :top_menu, :redmarc, { :controller => 'redmarc', :action => 'index' }, :caption => 'Redmarc'
+  begin
+    menu :top_menu, :redmarc, { :controller => 'redmarc', :action => 'index' }, :caption => 'Redmarc'
+  rescue
+    # Menu item already registered – safe to skip on reload
+  end
 end
