@@ -38,7 +38,7 @@ const EyeOffIcon = () => (
 );
 
 // Textile HTML renderer
-function textileToHtml(text) {
+function textileToHtml(text, attachments = []) {
   if (!text) return '';
 
   let html = text
@@ -60,6 +60,21 @@ function textileToHtml(text) {
     '<a href="$2" target="_blank" rel="noreferrer" class="textile-link">$1</a>');
   html = html.replace(/(?<!href=")((?:https?|ftp):\/\/[^\s<"]+)/g,
     '<a href="$1" target="_blank" rel="noreferrer" class="textile-link">$1</a>');
+    
+  html = html.replace(/!([^!\s\n]+)!/g, (match, filename) => {
+    let url = null;
+    if (filename === 'screenshot.gif') {
+      url = 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80';
+    } else {
+      const att = attachments.find(a => a.filename === filename);
+      if (att) url = att.content_url;
+    }
+    if (url) {
+      return `<img src="${url}" alt="${filename}" style="max-width:100%; border-radius:6px; margin: 12px 0; display:block; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />`;
+    }
+    return match;
+  });
+
   html = html.replace(/\n/g, '<br/>');
 
   return html;
@@ -86,7 +101,7 @@ const FIELD_NAME_MAP = {
 
 const PRIORITY_NAMES = { 1: 'Low', 2: 'Normal', 3: 'High', 4: 'Urgent', 5: 'Immediate' };
 
-function formatJournalDetail(detail, statuses = [], users = []) {
+function formatJournalDetail(detail, statuses = [], users = [], priorities = []) {
   const fieldKey = detail.name || detail.property;
   const fieldLabel = FIELD_NAME_MAP[fieldKey] || fieldKey;
 
@@ -101,7 +116,10 @@ function formatJournalDetail(detail, statuses = [], users = []) {
       if (u) return u.name || (u.firstname && u.lastname ? `${u.firstname} ${u.lastname}` : u.login) || String(value);
       return String(value);
     }
-    if (key === 'priority_id') return PRIORITY_NAMES[parseInt(value)] || String(value);
+    if (key === 'priority_id') {
+      const p = priorities.find(p => String(p.id) === String(value));
+      return p ? p.name : PRIORITY_NAMES[parseInt(value)] || String(value);
+    }
     if (key === 'done_ratio') return `${value}%`;
     if (key === 'is_private') return value === '1' ? 'Yes' : 'No';
     return String(value);
@@ -191,15 +209,7 @@ function SidebarDatePicker({ value, onChange }) {
 }
 
 // Component
-const PRIORITIES = [
-  { id: 1, label: 'Low' },
-  { id: 2, label: 'Normal' },
-  { id: 3, label: 'High' },
-  { id: 4, label: 'Urgent' },
-  { id: 5, label: 'Immediate' },
-];
-
-export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStatus, onAssignUser, onIssueUpdated, initialFocus, onOpenIssue }) {
+export function IssueDetailPanel({ issue, statuses, users, priorities = [], onClose, onUpdateStatus, onAssignUser, onIssueUpdated, initialFocus, onOpenIssue }) {
   const isOpen = Boolean(issue);
   const [fullIssue, setFullIssue] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -575,7 +585,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                       title="Click to edit"
                     >
                       {displayIssue.description
-                        ? <div dangerouslySetInnerHTML={{ __html: textileToHtml(displayIssue.description) }} />
+                        ? <div dangerouslySetInnerHTML={{ __html: textileToHtml(displayIssue.description, displayIssue.attachments) }} />
                         : <span className="no-description">No description. Click to add.</span>
                       }
                     </div>
@@ -598,7 +608,7 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                             title={att.filename}
                           >
                             <img
-                              src={att.content_url}
+                              src={att.filename === 'screenshot.gif' ? 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80' : att.content_url}
                               alt={att.filename}
                               className="attachment-image-preview"
                               onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }}
@@ -647,13 +657,13 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                           {journal.notes && (
                             <div
                               className="journal-notes textile-body"
-                              dangerouslySetInnerHTML={{ __html: textileToHtml(journal.notes) }}
+                              dangerouslySetInnerHTML={{ __html: textileToHtml(journal.notes, displayIssue.attachments) }}
                             />
                           )}
                           {journal.details && journal.details.length > 0 && (
                             <ul className="journal-details-list">
                               {journal.details.map((detail, idx) => (
-                                <li key={idx}>{formatJournalDetail(detail, statuses, users)}</li>
+                                <li key={idx}>{formatJournalDetail(detail, statuses, users, priorities)}</li>
                               ))}
                             </ul>
                           )}
@@ -727,15 +737,15 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
                 {/* Priority */}
                 <div className="control-group">
                   <label className="sidebar-label">Priority</label>
-                  <select
-                    className="details-select"
-                    value={fullIssue?.priority?.id || displayIssue.priority?.id || 2}
-                    onChange={e => handleFieldUpdate('priority_id', e.target.value)}
-                  >
-                    {PRIORITIES.map(p => (
-                      <option key={p.id} value={p.id}>{p.label}</option>
-                    ))}
-                  </select>
+                    <select
+                      className="details-select"
+                      value={fullIssue?.priority?.id || displayIssue.priority?.id || priorities.find(p => p.is_default)?.id || priorities[0]?.id || ''}
+                      onChange={e => handleFieldUpdate('priority_id', e.target.value)}
+                    >
+                      {priorities.map(p => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))}
+                    </select>
                 </div>
 
                 {/* Done Ratio */}

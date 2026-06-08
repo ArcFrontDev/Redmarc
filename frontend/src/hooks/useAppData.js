@@ -29,6 +29,7 @@ export function useAppData() {
   const [issues, setIssues] = useState([]);
   const [projects, setProjects] = useState([]);
   const [statuses, setStatuses] = useState([]);
+  const [priorities, setPriorities] = useState([]);
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -66,13 +67,15 @@ export function useAppData() {
     try {
       setLoading(true);
       setError(null);
-      const [projectsData, statusesData, currentUserData] = await Promise.all([
+      const [projectsData, statusesData, prioritiesData, currentUserData] = await Promise.all([
         api.getProjects(),
         api.getStatuses(),
+        api.getPriorities().catch(() => ({ issue_priorities: [] })),
         api.getCurrentUser().catch(() => ({ user: null }))
       ]);
       setProjects(projectsData.projects || []);
       setStatuses(statusesData.issue_statuses || []);
+      setPriorities(prioritiesData.issue_priorities || []);
       if (currentUserData.user) {
         setCurrentUser(currentUserData.user);
       }
@@ -220,6 +223,7 @@ export function useAppData() {
     issues, setIssues,
     projects,
     statuses,
+    priorities,
     users,
     currentUser,
     loading, setLoading,

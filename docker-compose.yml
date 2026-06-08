@@ -18,7 +18,7 @@ services:
   redmine:
     image: redmine:5.1
     ports:
-      - "8080:3000"
+      - "3000:3000"
     environment:
       REDMINE_DB_POSTGRES: db
       REDMINE_DB_USERNAME: redmine

@@ -4,9 +4,9 @@
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
-  "forwardPorts": [8080, 5173],
+  "forwardPorts": [3000, 5173],
   "portsAttributes": {
-    "8080": {
+    "3000": {
       "label": "Redmine Sandbox",
       "onAutoForward": "notify"
     },

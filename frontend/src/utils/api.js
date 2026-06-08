@@ -83,6 +83,7 @@ export const api = {
   deleteProject: (id) => request(`/projects/${id}.json`, { method: 'DELETE' }),
 
   getStatuses: () => request('/issue_statuses.json'),
+  getPriorities: () => request('/enumerations/issue_priorities.json'),
 
   /**
    * Fetch all users. Requires Redmine admin rights.

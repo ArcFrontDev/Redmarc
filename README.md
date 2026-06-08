@@ -16,7 +16,7 @@
 
 > **Redmarc is now an Open Core project.** This repository serves as the foundational open-source core of Redmarc. Going forward, major new features will not be added to this repository. Instead, our focus here will be entirely on **stabilizing, refining, and polishing** the existing feature set.
 >
-> The only major update planned for the Open Core edition in the future is **full localization** for 6 main languages: English, Russian, Spanish, French, German, and Chinese.
+> The only major update planned for the Open Core edition in the future is **full localization** for 6 main languages: English, Russian, Japanese, French, German, and Chinese.
 
 </details>
 
@@ -77,7 +77,7 @@ docker-compose up -d
 ```
 
 Docker will build the DB, run core migrations, generate secrets, and seed the database. 
-Once the containers are running, Redmine will be available at: **`http://localhost:8080`**
+Once the containers are running, Redmine will be available at: **`http://localhost:3000`**
 
 **Sandbox Credentials:**
 * **Login:** `tester`
@@ -115,7 +115,7 @@ The frontend communicates exclusively through Redmine's public JSON API. The bac
 1. **Clone into your Redmine plugins directory**
    ```bash
    cd /path/to/redmine/plugins
-   git clone https://github.com/ArcFrontDev/Redmarc.git arcfront
+   git clone https://github.com/ArcFrontDev/Redmarc.git redmarc
    ```
 
 2. **Install Ruby dependencies**
@@ -163,7 +163,7 @@ The dev server proxies asset requests. Make sure your Redmine instance is runnin
 
 ## Roadmap
 
-* [ ] Full localization (English, Russian, Spanish, French, German, Chinese)
+* [ ] Full localization (English, Russian, Japanese, French, German, Chinese)
 * [ ] Gantt / Timeline view
 * [ ] Time tracker with live timer
 * [ ] Saved filters and custom views

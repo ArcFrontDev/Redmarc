@@ -11,6 +11,7 @@ const XIcon = () => (
 export function CreateIssueModal({
   projects,
   statuses,
+  priorities = [],
   users,
   defaultProjectId,
   defaultStatusId,
@@ -22,13 +23,15 @@ export function CreateIssueModal({
     return n.includes('new') || n.includes('open') || n === 'новая';
   })?.id || statuses[0]?.id || '';
 
+  const defaultPriorityId = priorities.find(p => p.is_default)?.id || priorities[0]?.id || '';
+
   const [form, setForm] = useState({
     project_id: defaultProjectId || projects[0]?.id || '',
     subject: '',
     description: '',
     status_id: defaultStatusId || firstStatusId,
     assigned_to_id: '',
-    priority_id: 2,
+    priority_id: defaultPriorityId,
     uploads: [],
   });
   const [submitting, setSubmitting] = useState(false);
