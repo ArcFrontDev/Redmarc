@@ -457,6 +457,22 @@ export function IssueDetailPanel({ issue, statuses, users, onClose, onUpdateStat
             {/* Header */}
             <div className="drawer-header">
               <div className="drawer-header-meta">
+                {(fullIssue?.parent || displayIssue.parent) && (
+                  <>
+                    <button
+                      className="subtask-parent-breadcrumb"
+                      style={{ background: 'none', border: 'none', color: 'var(--color-text-secondary)', cursor: 'pointer', padding: 0, fontSize: 'inherit', fontWeight: 'bold' }}
+                      onClick={() => {
+                        const pId = (fullIssue?.parent || displayIssue.parent)?.id;
+                        if (onOpenIssue && pId) onOpenIssue(pId);
+                      }}
+                      title="Navigate to parent issue"
+                    >
+                      #{ (fullIssue?.parent || displayIssue.parent)?.id }
+                    </button>
+                    <span className="breadcrumb-separator" style={{ margin: '0 8px', color: 'var(--color-border)' }}>/</span>
+                  </>
+                )}
                 <span className="details-issue-id">#{displayIssue.id}</span>
                 <span className="details-project-tag">{displayIssue.project?.name}</span>
               </div>
