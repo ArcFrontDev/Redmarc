@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import './App.css';
 
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -26,7 +27,7 @@ function App() {
   const searchRef = useRef(null);
 
   const {
-    issues, projects, statuses, users, currentUser,
+    issues, projects, statuses, priorities, users, currentUser,
     loading, error,
     loadData,
     updateIssueStatus,
@@ -292,6 +293,7 @@ function App() {
           {!loading && !error && (view === 'kanban' || view === 'swimlanes') && (
             <KanbanBoard
               groupedIssues={groupedIssues}
+              rawIssues={issues}
               onIssueClick={issue => { setDetailInitialFocus(null); setSelectedIssue(issue); }}
               onAddIssue={() => setIsCreateIssueOpen(true)}
               onDragEnd={handleDragEnd}
@@ -341,6 +343,7 @@ function App() {
         <IssueDetailPanel
           issue={selectedIssue}
           statuses={statuses}
+          priorities={priorities}
           users={users}
           onClose={() => { setSelectedIssue(null); setDetailInitialFocus(null); }}
           onUpdateStatus={handleUpdateStatus}
@@ -355,35 +358,40 @@ function App() {
           }}
         />
 
-        {isCreateIssueOpen && (
+        {isCreateIssueOpen && createPortal(
           <CreateIssueModal
             projects={projects}
             statuses={statuses}
+            priorities={priorities}
             users={users}
             defaultProjectId={defaultProjectId}
             defaultStatusId=""
             onSubmit={handleCreateIssue}
             onClose={() => setIsCreateIssueOpen(false)}
-          />
+          />,
+          document.body
         )}
 
-        {isCreateProjectOpen && (
+        {isCreateProjectOpen && createPortal(
           <CreateProjectModal
             onSubmit={handleCreateProject}
             onClose={() => setIsCreateProjectOpen(false)}
-          />
+          />,
+          document.body
         )}
 
-        {deleteConfirm.isOpen && (
+        {deleteConfirm.isOpen && createPortal(
           <DeleteConfirmModal
             projectName={deleteConfirm.project?.name || ''}
             onConfirm={handleDeleteProject}
             onClose={() => setDeleteConfirm({ isOpen: false, project: null })}
-          />
+          />,
+          document.body
         )}
 
-        {isHotkeysOpen && (
-          <HotkeysModal onClose={() => setIsHotkeysOpen(false)} />
+        {isHotkeysOpen && createPortal(
+          <HotkeysModal onClose={() => setIsHotkeysOpen(false)} />,
+          document.body
         )}
 
         {contextMenu.visible && (
@@ -409,3 +417,6 @@ function App() {
 }
 
 export default App;
+
+console.log('Force cache bust v4');
+

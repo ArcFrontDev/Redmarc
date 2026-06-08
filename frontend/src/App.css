@@ -550,6 +550,7 @@ body.light-theme .column-count { background: rgba(0, 0, 0, 0.06); }
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-height: 0;
 }
 
 .column-empty-state {
@@ -616,6 +617,8 @@ body.light-theme .column-add-btn {
   overflow: hidden;
   position: relative;
   box-shadow: var(--shadow-card);
+  flex-shrink: 0;
+  min-height: max-content;
 }
 
 .issue-card:hover {
@@ -1155,6 +1158,8 @@ body.light-theme .close-modal-btn:hover {
   position: fixed;
   inset: 0;
   background: var(--modal-overlay-bg);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2155,7 +2160,7 @@ body.light-theme .textile-body .textile-code {
   display: flex;
   flex: 1;
   gap: 12px;
-  height: 200px;
+  min-height: 60px;
 }
 
 .swimlane-columns .kanban-column {
@@ -2163,11 +2168,19 @@ body.light-theme .textile-body .textile-code {
   border: 1px dashed transparent;
   padding: 0;
   min-width: 200px;
+  flex: 1;
 }
 
 .swimlane-columns .kanban-column.is-drag-over {
   border-color: var(--primary-color);
   background: rgba(88, 101, 242, 0.05);
+}
+
+.swimlane-columns .column-empty-state {
+  border: none;
+  background: transparent;
+  margin-top: 0;
+  padding: 10px;
 }
 
 .card-compact-layout {
@@ -2303,4 +2316,7 @@ body.light-theme .textile-body .textile-code {
   from { transform: translate(-50%, 20px); opacity: 0; }
   to { transform: translate(-50%, 0); opacity: 1; }
 }
+
+
+.force-cache-bust-v3 { display: none; }
 
